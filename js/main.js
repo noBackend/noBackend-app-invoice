@@ -63,4 +63,30 @@ var saveInvoice = function() {
   })
 }
 
+window.downloadInvoice = function() {
+  html2canvas($('#page-wrap')[0], {
+    onrendered: function(canvas) {
+      downloadWithName(canvas.toDataURL("image/pdf"), "invoice.png")
+    }
+  })
+
+  function downloadWithName(uri, name) {
+      function eventFire(el, etype){
+          if (el.fireEvent) {
+              (el.fireEvent('on' + etype));
+          } else {
+              var evObj = document.createEvent('Events');
+              evObj.initEvent(etype, true, false);
+              el.dispatchEvent(evObj);
+          }
+      }
+
+      var link = document.createElement("a");
+      link.download = name;
+      link.href = uri;
+      eventFire(link, "click");
+
+  }
+};
+
 $( init )
