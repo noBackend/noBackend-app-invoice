@@ -1,12 +1,11 @@
 /*
-	 CSS-Tricks Example
-	 by Chris Coyier
-	 http://css-tricks.com
+    
+  based on work by Chris Coyier (http://css-tricks.com/editable-invoice-v2/)
 */
 
 * { margin: 0; padding: 0; }
 body { font: 14px/1.4 Georgia, serif; }
-#page-wrap { width: 800px; margin: 0 auto; }
+#page-wrap { width: 800px; padding: 40px; margin: 80px auto 0; background: #FFF; box-shadow: 0 1px 5px rgba(0,0,0,.5);}
 
 textarea { border: 0; font: 14px Georgia, Serif; overflow: hidden; resize: none; }
 table { border-collapse: collapse; }
