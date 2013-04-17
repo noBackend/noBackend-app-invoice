@@ -1,5 +1,5 @@
 /*
-    
+
   based on work by Chris Coyier (http://css-tricks.com/editable-invoice-v2/)
 */
 
@@ -9,9 +9,9 @@ body { font: 14px/1.4 Georgia, serif; }
 
 textarea { border: 0; font: 14px Georgia, Serif; overflow: hidden; resize: none; }
 table { border-collapse: collapse; }
-table td, table th { border: 1px solid black; padding: 5px; }
+table td, table th { border: none; padding: 5px; }
 
-#header { height: 15px; width: 100%; margin: 20px 0; background: #222; text-align: center; color: white; font: bold 15px Helvetica, Sans-Serif; text-decoration: uppercase; letter-spacing: 20px; padding: 8px 0px; }
+#header { height: 15px; width: 100%; margin: 20px 0; background: #222; text-align: center; color: white; font: bold 15px Helvetica, Sans-Serif; text-decoration: uppercase; letter-spacing: 20px; padding: 9px 0 0 0; }
 
 #address { width: 250px; height: 150px; float: left; }
 #customer { overflow: hidden; clear: both;}
@@ -27,21 +27,24 @@ table td, table th { border: 1px solid black; padding: 5px; }
 .edit #image, #save-logo, #cancel-logo, .edit #change-logo, .edit #delete-logo { display: none; }
 #customer-title { font-size: 20px; font-weight: bold; float: left; }
 
-#meta { margin-top: 1px; width: 300px; float: right; }
+#meta { margin-top: 1px; width: 300px; float: right; margin-right: 20px; }
 #meta td { text-align: right;  }
-#meta td.meta-head { text-align: left; background: #eee; }
-#meta td textarea { width: 100%; height: 20px; text-align: right; }
+#meta td.meta-head { text-align: right; background: #eee; padding: 0 20px;
+height: 60px;}
+#meta td textarea { width: 90%; height: 20px; text-align: right; padding-top: 13px;
+margin: 5px -6px 5px 0px;}
 
-#items { clear: both; width: 100%; margin: 30px 0 0 0; border: 1px solid black; }
-#items th { background: #eee; }
-#items textarea { width: 80px; height: 50px; }
+#items { clear: both; width: 100%; margin: 30px 0 0 0; border: none; }
+#items th { background: #eee; text-align: left;
+padding-left: 10px;}
+#items textarea { width: 80px; height: 16px; width: 90%; padding-top: 13px;}
 #items tr.item-row td { border: 0; vertical-align: top; }
 #items td.description { width: 300px; }
 #items td.item-name { width: 175px; }
-#items td.description textarea, #items td.item-name textarea { width: 100%; }
+#items td.description textarea, #items td.item-name textarea { width: 90%; }
 #items td.total-line { border-right: 0; text-align: right; }
-#items td.total-value { border-left: 0; padding: 10px; }
-#items td.total-value textarea { height: 20px; background: none; }
+#items td.total-value { border-left: 0; padding: 10px; padding: 10px 20px 10px 10px; }
+#items td.total-value textarea { height: 20px; background: none; margin: 5px -3px; text-align: right;}
 #items td.balance { background: #eee; }
 #items td.blank { border: 0; }
 
@@ -49,7 +52,31 @@ table td, table th { border: 1px solid black; padding: 5px; }
 #terms h5 { text-transform: uppercase; font: 13px Helvetica, Sans-Serif; letter-spacing: 10px; border-bottom: 1px solid black; padding: 0 0 8px 0; margin: 0 0 8px 0; }
 #terms textarea { width: 100%; text-align: center;}
 
-textarea:hover, textarea:focus, #items td.total-value textarea:hover, #items td.total-value textarea:focus, .delete:hover { background-color:#EEFF88; }
+textarea:hover, textarea:focus, #items td.total-value textarea:hover, #items td.total-value textarea:focus, .delete:hover { background-color:#FF8; }
 
 .delete-wpr { position: relative; }
 .delete { display: block; color: #000; text-decoration: none; position: absolute; background: #EEEEEE; font-weight: bold; padding: 0px 3px; border: 1px solid; top: -6px; left: -22px; font-family: Verdana; font-size: 12px; }
+.price{
+  line-height: 46px;
+  padding-right: 20px;
+}
+
+td.priceColumn{
+  text-align: right;
+}
+
+#items th.priceColumn{
+  text-align: right;
+  padding-right: 25px;
+}
+
+#subtotal,
+#total,
+.due{
+  text-align: right;
+  margin-right: 5px;
+}
+
+#meta .due{
+  margin-right: 0;
+}

@@ -83,3 +83,20 @@ body .hoodie-account-signedout{
   bottom: 0;
   left: 0;
 }
+
+textarea,
+textarea:focus{
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+}
+
+.delete {
+  position: absolute;
+  left: -110px;
+  width: 10px;
+  display: block;
+  top: 10px;
+}
