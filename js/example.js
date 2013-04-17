@@ -82,8 +82,15 @@ function update_balance() {
   $('.due').html("$"+due);
 }
 
-function update_price() {
-  var row = $(this).parents('.item-row');
+function update_price(itemRow) {
+  var row;
+  if($(itemRow).hasClass('item-row')){
+    // if called directly
+    row = $(itemRow)
+  } else {
+    // if called from blur
+    row = $(this).parents('.item-row');
+  }
   var price = row.find('.cost').val().replace("$","") * row.find('.qty').val();
   price = roundNumber(price,2);
   isNaN(price) ? row.find('.price').html("N/A") : row.find('.price').html("$"+price);
@@ -104,7 +111,7 @@ $(document).ready(function() {
 
   $("#paid").blur(update_balance);
 
-  $("#addrow").click(function(){
+  $("body").on('click', '#addrow', function(){
     $(".item-row:last").after('<tr class="item-row"><td class="item-name"><div class="delete-wpr"><textarea name="item-name">Item Name</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td><td class="description"><textarea name="item-desc">Description</textarea></td><td><textarea name="item-cost" class="cost">$0</textarea></td><td><textarea name="item-qty" class="qty">0</textarea></td><td class="priceColumn"><span class="price">$0</span></td></tr>');
     if ($(".delete").length > 0) $(".delete").show();
     $('textarea').autosize();

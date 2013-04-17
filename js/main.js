@@ -8,12 +8,22 @@ var init = function() {
   });
   $('.invoiceList').on('click', 'a', function(event) {
     event.preventDefault();
-    console.log("load invoice "+$(this).data('id'))
+    var id = $(this).data('id')
+    console.log("load invoice "+id)
+    hoodie.store.find('invoice', id).done(function(invoice){
+      console.log("invoice: ",invoice);
+      var html = ich.invoice(invoice);
+      console.log("html: ",html);
+      $('#page-wrap').empty().append(html);
+      $('.item-row').each(function(){update_price(this)});
+      $('textarea').autosize();
+    })
   });
   buildInvoiceList();
 }
 
 var buildInvoiceList = function() {
+  $('.invoiceList').empty();
   hoodie.store.findAll('invoice').done(function(invoices){
     invoices.forEach(function(invoice){
       $('.invoiceList').append('<li><a href="#" data-id="'+invoice.id+'">'+invoice.customer+' - '+invoice.invoiceNr+'</a></li>')
@@ -46,6 +56,7 @@ var saveInvoice = function() {
   hoodie.store.add('invoice', data)
   .done(function(data){
     console.log("Invoice saved", data)
+    buildInvoiceList()
   })
   .fail(function(data){
     console.log("Invoice not saved", data)

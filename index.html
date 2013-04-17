@@ -108,6 +108,7 @@ c/o Steve Widget</textarea>
   		  <textarea name="terms">NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
   		</div><!-- /terms -->
   	</div>
+
     <div class="footerBar">
       <div class="buttons">
         <button class="save btn btn-small btn-success">Save</button>
@@ -168,12 +169,102 @@ c/o Steve Widget</textarea>
       </div>
     </div>
 
+    <script id="invoiceItem" class="partial" type="text/html">
+      <tr class="item-row">
+          <td class="item-name">
+            <div class="delete-wpr">
+              <textarea name="item-name">{{item-name}}</textarea>
+              <a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a>
+            </div>
+          </td>
+          <td class="description">
+            <textarea name="item-description">{{item-description}}</textarea>
+          </td>
+          <td><textarea name="item-cost" class="cost">{{item-cost}}</textarea></td>
+          <td><textarea name="item-qty" class="qty">{{item-qty}}</textarea></td>
+          <td class="priceColumn"><span class="price"></span></td>
+      </tr>
+    </script>
+
+    <script id="invoice" type="text/html">
+      <textarea name="header" id="header">{{header}}</textarea>
+      <div id="identity">
+        <textarea name="address" id="address">{{address}}</textarea>
+      </div>
+      <div id="customer">
+        <textarea name="customer" id="customer-title">{{customer}}</textarea>
+        <table id="meta">
+          <tr>
+            <td class="meta-head">Invoice #</td>
+            <td><textarea name="invoiceNr">{{invoiceNr}}</textarea></td>
+          </tr>
+          <tr>
+            <td class="meta-head">Date</td>
+            <td><textarea name="date" id="date">{{date}}</textarea></td>
+          </tr>
+          <tr>
+            <td class="meta-head">Amount Due</td>
+            <td><div class="due"></div></td>
+          </tr>
+        </table>
+      </div>
+
+      <table id="items">
+
+        <tr>
+            <th>Item</th>
+            <th>Description</th>
+            <th>Unit Cost</th>
+            <th>Quantity</th>
+            <th class="priceColumn">Price</th>
+        </tr>
+
+        {{#items}}
+          {{>invoiceItem}}
+        {{/items}}
+
+        <tr id="hiderow">
+          <td colspan="5"><a class="btn btn-primary" id="addrow" href="javascript:;" title="Add a row">Add a row</a></td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="blank"> </td>
+            <td colspan="2" class="total-line">Subtotal</td>
+            <td class="total-value"><div id="subtotal"></div></td>
+        </tr>
+        <tr>
+
+            <td colspan="2" class="blank"> </td>
+            <td colspan="2" class="total-line">Total</td>
+            <td class="total-value"><div id="total"></div></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="blank"> </td>
+            <td colspan="2" class="total-line">Amount Paid</td>
+
+            <td class="total-value"><textarea name="paid" id="paid">{{paid}}</textarea></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="blank"> </td>
+            <td colspan="2" class="total-line balance">Balance Due</td>
+            <td class="total-value balance"><div class="due"></div></td>
+        </tr>
+
+      </table>
+
+      <div id="terms">
+        <h5>Terms</h5>
+        <textarea name="terms">NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
+      </div><!-- /terms -->
+    </script>
+
     <script src='js/vendor/jquery-1.9.1.js'></script>
     <script src='js/vendor/hoodie.js'></script>
     <script src='js/vendor/bootstrap.js'></script>
     <script src='js/hoodie.accountbar.bootstrap.js'></script>
     <script src='js/bootstrap.modalform.js'></script>
     <script src='js/jquery.autosize-min.js'></script>
+    <script src='js/ICanHaz.min.js'></script>
 
     <script src='js/example.js'></script>
     <script src='js/main.js'></script>
