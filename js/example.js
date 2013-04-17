@@ -105,7 +105,7 @@ $(document).ready(function() {
   $("#paid").blur(update_balance);
 
   $("#addrow").click(function(){
-    $(".item-row:last").after('<tr class="item-row"><td class="item-name"><div class="delete-wpr"><textarea>Item Name</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td><td class="description"><textarea>Description</textarea></td><td><textarea class="cost">$0</textarea></td><td><textarea class="qty">0</textarea></td><td class="priceColumn"><span class="price">$0</span></td></tr>');
+    $(".item-row:last").after('<tr class="item-row"><td class="item-name"><div class="delete-wpr"><textarea name="item-name">Item Name</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td><td class="description"><textarea name="item-desc">Description</textarea></td><td><textarea name="item-cost" class="cost">$0</textarea></td><td><textarea name="item-qty" class="qty">0</textarea></td><td class="priceColumn"><span class="price">$0</span></td></tr>');
     if ($(".delete").length > 0) $(".delete").show();
     $('textarea').autosize();
     bind();

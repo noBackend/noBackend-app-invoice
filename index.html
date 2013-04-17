@@ -14,11 +14,11 @@
   <body>
   	<div id="page-wrap">
 
-  		<textarea id="header">INVOICE</textarea>
+  		<textarea name="header" id="header">INVOICE</textarea>
 
   		<div id="identity">
 
-        <textarea id="address">Chris Coyier
+        <textarea name="address" id="address">Chris Coyier
 123 Appleseed Street
 Appleville, WI 53719
 
@@ -44,17 +44,17 @@ Phone: (555) 555-5555</textarea><!-- /address -->
   		</div><!-- /identity -->
 
   		<div id="customer">
-        <textarea id="customer-title">Widget Corp.
+        <textarea name="customer" id="customer-title">Widget Corp.
 c/o Steve Widget</textarea>
 
         <table id="meta">
           <tr>
             <td class="meta-head">Invoice #</td>
-            <td><textarea>000123</textarea></td>
+            <td><textarea name="invoiceNr">000123</textarea></td>
           </tr>
           <tr>
             <td class="meta-head">Date</td>
-            <td><textarea id="date">December 15, 2009</textarea></td>
+            <td><textarea name="date" id="date">December 15, 2009</textarea></td>
           </tr>
           <tr>
             <td class="meta-head">Amount Due</td>
@@ -75,19 +75,19 @@ c/o Steve Widget</textarea>
   		  </tr>
 
   		  <tr class="item-row">
-  		      <td class="item-name"><div class="delete-wpr"><textarea>Web Updates</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td>
-  		      <td class="description"><textarea>Monthly web updates for http://widgetcorp.com (Nov. 1 - Nov. 30, 2009)</textarea></td>
-  		      <td><textarea class="cost">$650.00</textarea></td>
-  		      <td><textarea class="qty">1</textarea></td>
+  		      <td class="item-name"><div class="delete-wpr"><textarea name="item-name">Web Updates</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td>
+  		      <td class="description"><textarea name="item-description">Monthly web updates for http://widgetcorp.com (Nov. 1 - Nov. 30, 2009)</textarea></td>
+  		      <td><textarea name="item-cost" class="cost">$650.00</textarea></td>
+  		      <td><textarea name="item-qty" class="qty">1</textarea></td>
   		      <td class="priceColumn"><span class="price">$650.00</span></td>
   		  </tr>
 
   		  <tr class="item-row">
-  		      <td class="item-name"><div class="delete-wpr"><textarea>SSL Renewals</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td>
+  		      <td class="item-name"><div class="delete-wpr"><textarea name="item-name">SSL Renewals</textarea><a class="delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td>
 
-  		      <td class="description"><textarea>Yearly renewals of SSL certificates on main domain and several subdomains</textarea></td>
-  		      <td><textarea class="cost">$75.00</textarea></td>
-  		      <td><textarea class="qty">3</textarea></td>
+  		      <td class="description"><textarea name="item-description">Yearly renewals of SSL certificates on main domain and several subdomains</textarea></td>
+  		      <td><textarea name="item-cost" class="cost">$75.00</textarea></td>
+  		      <td><textarea name="item-qty" class="qty">3</textarea></td>
   		      <td class="priceColumn"><span class="price">$225.00</span></td>
   		  </tr>
 
@@ -110,7 +110,7 @@ c/o Steve Widget</textarea>
   		      <td colspan="2" class="blank"> </td>
   		      <td colspan="2" class="total-line">Amount Paid</td>
 
-  		      <td class="total-value"><textarea id="paid">$0.00</textarea></td>
+  		      <td class="total-value"><textarea name="paid" id="paid">$0.00</textarea></td>
   		  </tr>
   		  <tr>
   		      <td colspan="2" class="blank"> </td>
@@ -122,10 +122,21 @@ c/o Steve Widget</textarea>
 
   		<div id="terms">
   		  <h5>Terms</h5>
-  		  <textarea>NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
+  		  <textarea name="terms">NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
   		</div><!-- /terms -->
   	</div>
     <div class="footerBar">
+      <div class="buttons">
+        <button class="save btn btn-small btn-success">Save</button>
+        <span class="btn-group dropup">
+          <button class="btn btn-small btn-primary">Your invoices</button>
+          <button class="btn btn-small dropdown-toggle btn-primary" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul class="invoiceList dropdown-menu pull-right">
+          </ul>
+        </span>
+      </div>
       <div class="hoodie-accountbar">
 
         <div class="hoodie-account-signedout">

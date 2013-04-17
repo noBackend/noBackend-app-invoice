@@ -19,6 +19,7 @@ body {
 body .hoodie-account-signedin,
 /*body .hoodie-account-signedout,*/
 html[data-hoodie-account-status=signedin]  .hoodie-account-signedout,
+html[data-hoodie-account-status=error]  .hoodie-account-signedout,
 body .hoodie-account-error {
   display: none;
 }
@@ -81,6 +82,13 @@ html[data-hoodie-account-status=signedout] .hoodie-account-signedout {
   left: 0;
 }
 
+.footerBar .buttons{
+  display: block;
+  position: absolute;
+  left:10px;
+  top:8px;
+}
+
 textarea,
 textarea:focus{
   border: none;
@@ -96,4 +104,14 @@ textarea:focus{
   width: 10px;
   display: block;
   top: 10px;
+}
+
+.btn-group{
+  display: inline-block;
+}
+
+.dropup .dropdown-menu.invoiceList{
+  left: 0;
+  width: auto;
+  right: auto;
 }
