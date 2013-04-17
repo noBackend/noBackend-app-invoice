@@ -42,7 +42,7 @@ function roundNumber(number,decimals) {
         }
       }
       d1 += 1;
-    } 
+    }
     if (d1 == 10) {
       numString = numString.substring(0, numString.lastIndexOf("."));
       var roundedNum = Number(numString) + 1;
@@ -71,14 +71,14 @@ function update_total() {
 
   $('#subtotal').html("$"+total);
   $('#total').html("$"+total);
-  
+
   update_balance();
 }
 
 function update_balance() {
   var due = $("#total").html().replace("$","") - $("#paid").val().replace("$","");
   due = roundNumber(due,2);
-  
+
   $('.due').html("$"+due);
 }
 
@@ -87,7 +87,7 @@ function update_price() {
   var price = row.find('.cost').val().replace("$","") * row.find('.qty').val();
   price = roundNumber(price,2);
   isNaN(price) ? row.find('.price').html("N/A") : row.find('.price').html("$"+price);
-  
+
   update_total();
 }
 
@@ -103,21 +103,21 @@ $(document).ready(function() {
   });
 
   $("#paid").blur(update_balance);
-   
+
   $("#addrow").click(function(){
     $(".item-row:last").after('<tr class="item-row"><td class="item-name"><div class="delete-wpr"><textarea>Item Name</textarea><a class="delete" href="javascript:;" title="Remove row">X</a></div></td><td class="description"><textarea>Description</textarea></td><td><textarea class="cost">$0</textarea></td><td><textarea class="qty">0</textarea></td><td><span class="price">$0</span></td></tr>');
     if ($(".delete").length > 0) $(".delete").show();
     bind();
   });
-  
+
   bind();
-  
-  $(".delete").live('click',function(){
+
+  $(".delete").on('click',function(){
     $(this).parents('.item-row').remove();
     update_total();
     if ($(".delete").length < 2) $(".delete").hide();
   });
-  
+
   $("#cancel-logo").click(function(){
     $("#logo").removeClass('edit');
   });
@@ -133,7 +133,7 @@ $(document).ready(function() {
     $("#image").attr('src',$("#imageloc").val());
     $("#logo").removeClass('edit');
   });
-  
+
   $("#date").val(print_today());
-  
+
 });
