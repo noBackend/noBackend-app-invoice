@@ -133,7 +133,7 @@ var saveInvoice = function() {
 var currentInvoiceToHTML = function() {
   var $result = $('#page-wrap').clone();
   $result.find('#hiderow, .notPartOfInvoice').remove()
-  return $result.html();
+  return $result.html().replace(/<textarea[^>]*>/g, '');
 }
 
 var currentInvoiceToText = function() {
@@ -160,7 +160,7 @@ var currentInvoiceToText = function() {
   return text;
 }
 
-var currentInvoiceNr() {
+var currentInvoiceNr = function() {
   return $.trim($('.invoiceNr').val())
 }
 
@@ -257,7 +257,7 @@ var sendInvoice = function(email) {
   }
   return sendEmail({
     to: email, 
-    subject: 'Invoice #' + currentInvoiceNr, 
+    subject: 'Invoice #' + currentInvoiceNr(), 
     html: currentInvoiceToHTML(), 
     text: currentInvoiceToText(),
     attachments: [ convert( $('.invoiceSheet') ).to("invoice.png") ]
