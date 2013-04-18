@@ -33,7 +33,18 @@ html[data-hoodie-account-status=signedout] .hoodie-account-signedout {
 .hoodie-accountbar {
   position: absolute;
   top: 8px;
-  right: 10px;
+  right: 0px;
+  margin-right: 0;
+  color: white;
+}
+
+.hoodie-account-signedin{
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.hoodie-username{
+  margin-right: 10px;
 }
 
 .playground .nav-tabs {
@@ -84,14 +95,17 @@ html[data-hoodie-account-status=signedout] .hoodie-account-signedout {
 
 .footerBar .buttons{
   display: block;
-  position: absolute;
-  left:10px;
-  top:8px;
+  position: relative;
+  width: 880px;
+  margin: 0px auto;
 }
 
-.footerBar .buttons>* {
+.footerBar .buttons>.btn,
+.footerBar .buttons>.btn-group{
+  margin-top: 7px;
   margin-right: 6px;
 }
+
 
 textarea,
 textarea:focus{
