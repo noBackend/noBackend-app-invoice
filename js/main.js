@@ -1,4 +1,7 @@
 window.hoodie  = new Hoodie('http://api.editableinvoicehoodie.dev');
+window.store = hoodie.store;
+window.remote = hoodie.remote;
+window.account = hoodie.account;
 
 var init = function() {
   currentId = null;
