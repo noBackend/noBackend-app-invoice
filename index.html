@@ -12,8 +12,7 @@
   </head>
 
   <body>
-  	<div id="page-wrap">
-      <!--
+  	<div id="page-wrap" class="invoiceSheet">
   		<textarea name="header" id="header">INVOICE</textarea>
 
   		<div id="identity">
@@ -33,7 +32,7 @@ c/o Steve Widget</textarea>
         <table id="meta">
           <tr>
             <td class="meta-head">Invoice #</td>
-            <td><textarea name="invoiceNr">000123</textarea></td>
+            <td><textarea class="invoiceNr" name="invoiceNr">000123</textarea></td>
           </tr>
           <tr>
             <td class="meta-head">Date</td>
@@ -120,6 +119,9 @@ c/o Steve Widget</textarea>
           <ul class="invoiceList dropdown-menu pull-right">
           </ul>
         </span>
+
+        <button class="download btn btn-inverse btn-small hide"><i class="icon-white icon-download-alt"></i> Download</button>
+        <button class="email btn btn-inverse btn-small hide"><i class="icon-white icon-envelope"></i> Email</button>
       </div>
       <div class="hoodie-accountbar">
 
@@ -269,5 +271,6 @@ c/o Steve Widget</textarea>
 
     <script src='js/example.js'></script>
     <script src='js/main.js'></script>
+    <script src='js/fake.js'></script>
   </body>
 </html>

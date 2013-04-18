@@ -48,6 +48,8 @@ var init = function() {
       buildInvoiceList();
     })
   })
+
+  $('.download.btn').click( downloadInvoice )
   buildInvoiceList();
 }
 
@@ -157,31 +159,81 @@ var currentInvoiceToText = function() {
   return text;
 }
 
-window.downloadInvoice = function() {
-  html2canvas($('#page-wrap')[0], {
+var convertElementToDataUrl = function( el, fileName ) {
+  var fileName
+  var fileType
+  var fileExtension
+  var defer = $.Deferred()
+
+
+  // be nice to jQuery-ists
+  if (el[0]) { el = el[0]; }
+
+  if (! fileName) {
+    fileName = "invoice.png";
+    fileType = "image/png";
+  } else {
+    fileExtension = fileName.match(/\.(.*)$/)
+    if (! fileExtension) {
+      defer.reject("Sorry, you need to set a supported file extension (.jpeg, .png, .pdf)!")
+      return defer.promise()
+    }
+    fileExtension = fileExtension.pop()
+    switch (fileExtension) {
+      case 'jpg':
+      case 'jpeg':
+        fileType = "image/jpeg"
+        break;
+
+      case 'png':
+        fileType = "image/png"
+        break;
+
+      // unfortunately not supported yet, that'll need some backend magic.
+      // case 'pdf':
+      //   fileType = "application/pdf"
+      //   break;
+      default: 
+        defer.reject("Sorry, you need to set a supported file extension (.jpeg, .png, .pdf)!")
+        return defer.promise()
+    }
+  }
+
+  html2canvas(el, {
     onrendered: function(canvas) {
-      downloadWithName(canvas.toDataURL("image/pdf"), "invoice.png")
+      defer.resolve(canvas.toDataURL( fileType ), fileName)
     }
   })
 
-  function downloadWithName(uri, name) {
-      function eventFire(el, etype){
-          if (el.fireEvent) {
-              (el.fireEvent('on' + etype));
-          } else {
-              var evObj = document.createEvent('Events');
-              evObj.initEvent(etype, true, false);
-              el.dispatchEvent(evObj);
-          }
-      }
-
-      var link = document.createElement("a");
-      link.download = name;
-      link.href = uri;
-      eventFire(link, "click");
-
-  }
+  return defer.promise()
 };
+
+var downloadInvoice = function() {
+  var invoiceName = $('.invoiceNr').val() || "invoice";
+  var fileName = invoiceName + ".png";
+  
+  return convertElementToDataUrl( $('.invoiceSheet'), fileName )
+  .then( function(dataUrl) {
+    download(dataUrl, fileName)
+  })
+};
+
+function download(uri, fileName) {
+  function eventFire(el, etype){
+      if (el.fireEvent) {
+          (el.fireEvent('on' + etype));
+      } else {
+          var evObj = document.createEvent('Events');
+          evObj.initEvent(etype, true, false);
+          el.dispatchEvent(evObj);
+      }
+  }
+
+  var link = document.createElement("a");
+  link.download = fileName;
+  link.href = uri;
+  eventFire(link, "click");
+}
 
  Date.prototype.ddmmyyyy = function() {
    var yyyy = this.getFullYear().toString();
