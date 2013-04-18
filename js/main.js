@@ -201,7 +201,7 @@ var convertElementToDataUrl = function( el, fileName ) {
 
   html2canvas(el, {
     onrendered: function(canvas) {
-      defer.resolve(canvas.toDataURL( fileType ), fileName)
+      defer.resolve(canvas.toDataURL( fileType ), fileName, fileType)
     }
   })
 
