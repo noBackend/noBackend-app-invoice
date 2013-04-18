@@ -31,7 +31,7 @@ var buildInvoiceList = function() {
   });
 }
 
-var saveInvoice = function() {
+var serializeCurrentInvoiceData = function() {
   var data = {}
   var item = null
   data.items = []
@@ -53,6 +53,11 @@ var saveInvoice = function() {
       }
     }
   })
+  return data;
+}
+
+var saveInvoice = function() {
+  data = serializeCurrentInvoiceData();
   hoodie.store.add('invoice', data)
   .done(function(data){
     console.log("Invoice saved", data)
@@ -61,6 +66,34 @@ var saveInvoice = function() {
   .fail(function(data){
     console.log("Invoice not saved", data)
   })
+}
+
+var currentInvoiceToHTML = function() {
+  return $('#page-wrap').html();
+}
+
+var currentInvoiceToText = function() {
+  var text = "";
+  $('#header, #address, #customer-title').each(function(index){
+    text += $(this).val().trim()+"\n\n"
+  })
+  $('#meta tr').each(function(index){
+    text += $(this).find('td:eq(0)').text()+ ": "+$(this).find('td:eq(1)').text()+ '\n'
+  })
+  text += '\n'
+  $('.item-row').each(function(index){
+    text += $(this).find('textarea:eq(0)').text()+ "\n"
+    text += $(this).find('textarea:eq(1)').text()+' - ';
+    text += $(this).find('textarea:eq(3)').text()+' x ';
+    text += $(this).find('textarea:eq(2)').text()+'\n';
+    text += 'Price: '+$(this).find('.price').text()+'\n\n';
+  })
+  text += 'Subtotal: '+$('#subtotal').text()+'\n'
+  text += 'Total: '+$('#total').text()+'\n'
+  text += 'Amount paid: '+$('#paid').val()+'\n\n'
+  text += 'Balance due: '+$('.total-value .due').text()+'\n\n'
+  text += 'Terms: '+$('#terms textarea').val()+'\n\n'
+  return text;
 }
 
 window.downloadInvoice = function() {
