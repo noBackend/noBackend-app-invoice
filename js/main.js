@@ -80,7 +80,6 @@ var serializeItems = function() {
       }
     })
   })
-  console.log("data: ",data);
   return data;
 }
 
@@ -158,7 +157,6 @@ var saveInvoice = function() {
   data = serializeCurrentInvoiceData();
   hoodie.store.add('invoice', data)
   .done(function(data){
-    console.log("Invoice saved", data)
     buildInvoiceList()
     currentId = data.id;
   })
