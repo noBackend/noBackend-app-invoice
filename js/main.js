@@ -69,7 +69,9 @@ var saveInvoice = function() {
 }
 
 var currentInvoiceToHTML = function() {
-  return $('#page-wrap').html();
+  var $result = $('#page-wrap').clone();
+  $result.find('#hiderow, .notPartOfInvoice').remove()
+  return $result.html();
 }
 
 var currentInvoiceToText = function() {
