@@ -19,22 +19,12 @@ var init = function() {
   $('textarea').autosize();
   $('button.newInvoice').click(function(event){
     event.preventDefault();
-    var html = ich.invoice(defaultData);
-    $('#page-wrap').empty().append(html);
-    $('.item-row').each(function(){update_price(this)});
-    $('textarea').autosize();
-    saveInvoice();
+    newInvoice();
   });
   $('.invoiceList').on('click', 'a', function(event) {
     event.preventDefault();
     var id = $(this).data('id')
-    hoodie.store.find('invoice', id).done(function(invoice){
-      var html = ich.invoice(invoice);
-      $('#page-wrap').empty().append(html);
-      $('.item-row').each(function(){update_price(this)});
-      $('textarea').autosize();
-      currentId = invoice.id;
-    })
+    loadInvoice(id);
   });
   $('#page-wrap').on('input change', 'textarea', function(event){
     var data = null;
@@ -51,7 +41,7 @@ var init = function() {
 
   $('.download.btn').click( downloadInvoice )
   $('.email.btn').click( sendInvoice )
-  buildInvoiceList();
+  buildInvoiceList(true);
 }
 
 var onAddRow = function() {
@@ -83,13 +73,33 @@ var serializeItems = function() {
   return data;
 }
 
-var buildInvoiceList = function() {
+var buildInvoiceList = function(loadLastInvoice) {
   $('.invoiceList').empty();
   hoodie.store.findAll('invoice').done(function(invoices){
     invoices.forEach(function(invoice){
-      $('.invoiceList').append('<li><a href="#" data-id="'+invoice.id+'">'+invoice.customer+' - '+invoice.invoiceNr+'</a></li>')
+      if(invoice.customer === ""){
+        $('.invoiceList').append('<li><a href="#" data-id="'+invoice.id+'">New invoice</a></li>')
+      } else {
+        $('.invoiceList').append('<li><a href="#" data-id="'+invoice.id+'">'+invoice.customer+' - '+invoice.invoiceNr+'</a></li>')
+      }
     });
+    if(loadLastInvoice){
+      var $lastInvoice = $('.invoiceList li:last-child a')
+      if($lastInvoice.length !== 0){
+        loadInvoice($lastInvoice.data('id'))
+      } else {
+        newInvoice()
+      }
+    }
   });
+}
+
+var newInvoice = function(){
+  var html = ich.invoice(defaultData);
+  $('#page-wrap').empty().append(html);
+  $('.item-row').each(function(){update_price(this)});
+  $('textarea').autosize();
+  saveInvoice();
 }
 
 var serializeCurrentInvoiceData = function() {
@@ -115,6 +125,16 @@ var serializeCurrentInvoiceData = function() {
     }
   })
   return data;
+}
+
+var loadInvoice = function(id) {
+  hoodie.store.find('invoice', id).done(function(invoice){
+    var html = ich.invoice(invoice);
+    $('#page-wrap').empty().append(html);
+    $('.item-row').each(function(){update_price(this)});
+    $('textarea').autosize();
+    currentId = invoice.id;
+  })
 }
 
 var saveInvoice = function() {
@@ -198,7 +218,7 @@ var convertElementToDataUrl = function( el, fileName ) {
       // case 'pdf':
       //   fileType = "application/pdf"
       //   break;
-      default: 
+      default:
         defer.reject("Sorry, you need to set a supported file extension (.jpeg, .png, .pdf)!")
         return defer.promise()
     }
@@ -216,7 +236,7 @@ var convertElementToDataUrl = function( el, fileName ) {
 var downloadInvoice = function() {
   var invoiceName = $('.invoiceNr').val() || "invoice";
   var fileName = invoiceName + ".png";
-  
+
   return convertElementToDataUrl( $('.invoiceSheet'), fileName )
   .then( function(dataUrl) {
     download(dataUrl, fileName)
@@ -251,14 +271,14 @@ d = new Date();
 d.ddmmyyyy();
 
 
-var sendInvoice = function(email) {  
+var sendInvoice = function(email) {
   if (typeof email != "string") {
     email = prompt("Recipient:")
   }
   return sendEmail({
-    to: email, 
-    subject: 'Invoice #' + currentInvoiceNr(), 
-    html: currentInvoiceToHTML(), 
+    to: email,
+    subject: 'Invoice #' + currentInvoiceNr(),
+    html: currentInvoiceToHTML(),
     text: currentInvoiceToText(),
     attachments: [ convert( $('.invoiceSheet') ).to("invoice.png") ]
   })

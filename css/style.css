@@ -4,7 +4,7 @@
 */
 
 * { margin: 0; padding: 0; }
-html{ background: url(/img/pattern.png)}
+html{ background: url('../img/pattern.png')}
 html body { font: 14px/1.4 Georgia, serif; background: transparent;}
 #page-wrap { width: 800px; padding: 40px; margin: 80px auto 0; background: #FFF; box-shadow: 0 1px 5px rgba(0,0,0,.5);}
 
