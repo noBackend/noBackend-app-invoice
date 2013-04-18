@@ -99,8 +99,7 @@ function update_price(itemRow) {
 }
 
 function bind() {
-  $(".cost").blur(update_price);
-  $(".qty").blur(update_price);
+  $("body").on('blur', '.cost, .qty', update_price);
 }
 
 $(document).ready(function() {
