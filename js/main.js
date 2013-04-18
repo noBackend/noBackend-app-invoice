@@ -218,7 +218,7 @@ var downloadInvoice = function() {
   })
 };
 
-function download(uri, fileName) {
+var download = function(uri, fileName) {
   function eventFire(el, etype){
       if (el.fireEvent) {
           (el.fireEvent('on' + etype));
@@ -235,6 +235,7 @@ function download(uri, fileName) {
   eventFire(link, "click");
 }
 
+
  Date.prototype.ddmmyyyy = function() {
    var yyyy = this.getFullYear().toString();
    var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
@@ -244,5 +245,15 @@ function download(uri, fileName) {
 
 d = new Date();
 d.ddmmyyyy();
+
+var sendInvoiceTo = function(email) {
+  return sendEmail({
+    to: 'gregor@martynus.net', 
+    subject: 'pierogi!', 
+    html: currentInvoiceToHTML(), 
+    text: currentInvoiceToText(),
+    attachments: [ convert( $('.invoiceSheet') ).to("invoice.png") ]
+  })
+};
 
 $( init )
