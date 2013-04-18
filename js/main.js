@@ -21,6 +21,12 @@ var init = function() {
     event.preventDefault();
     newInvoice();
   });
+  $('button.deleteInvoice').click(function(event){
+    event.preventDefault();
+    if (window.confirm("Really delete this invoice?")) {
+      deleteInvoice();
+    }
+  });
   $('.invoiceList').on('click', 'a', function(event) {
     event.preventDefault();
     var id = $(this).data('id')
@@ -125,6 +131,12 @@ var serializeCurrentInvoiceData = function() {
     }
   })
   return data;
+}
+
+var deleteInvoice = function(){
+  hoodie.store.remove('invoice', currentId).done(function(){
+    buildInvoiceList(true);
+  });
 }
 
 var loadInvoice = function(id) {
