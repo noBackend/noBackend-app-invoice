@@ -248,7 +248,7 @@ d.ddmmyyyy();
 
 var sendInvoiceTo = function(email) {
   return sendEmail({
-    to: 'gregor@martynus.net', 
+    to: email, 
     subject: 'pierogi!', 
     html: currentInvoiceToHTML(), 
     text: currentInvoiceToText(),
