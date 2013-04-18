@@ -1,25 +1,83 @@
 window.hoodie  = new Hoodie('http://api.editableinvoicehoodie.dev');
 
 var init = function() {
+  currentId = null;
+  defaultData = {
+    items: [
+       {
+           "item-name": "Example item",
+           "item-description": "Example item description",
+           "item-cost": "$650.00",
+           "item-qty": "2"
+       }
+   ],
+   date: new Date().ddmmyyyy(),
+   paid: "$0.00",
+   header: "INVOICE",
+   terms: 'NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.'
+  }
   $('textarea').autosize();
-  $('button.save').click(function(event){
+  $('button.newInvoice').click(function(event){
     event.preventDefault();
+    var html = ich.invoice(defaultData);
+    $('#page-wrap').empty().append(html);
+    $('.item-row').each(function(){update_price(this)});
+    $('textarea').autosize();
     saveInvoice();
   });
   $('.invoiceList').on('click', 'a', function(event) {
     event.preventDefault();
     var id = $(this).data('id')
-    console.log("load invoice "+id)
     hoodie.store.find('invoice', id).done(function(invoice){
-      console.log("invoice: ",invoice);
       var html = ich.invoice(invoice);
-      console.log("html: ",html);
       $('#page-wrap').empty().append(html);
       $('.item-row').each(function(){update_price(this)});
       $('textarea').autosize();
+      currentId = invoice.id;
     })
   });
+  $('#page-wrap').on('input change', 'textarea', function(event){
+    var data = null;
+    if($(this).closest('.item-row').length !== 0){
+      data = serializeItems();
+    } else {
+      data = {};
+      data[$(this).attr('name')] = $(this).val()
+    }
+    hoodie.store.update('invoice', currentId , data).done(function(){
+      buildInvoiceList();
+    })
+  })
   buildInvoiceList();
+}
+
+var onAddRow = function() {
+  hoodie.store.update('invoice', currentId , serializeItems());
+}
+
+var onDeleteRow = function() {
+  hoodie.store.update('invoice', currentId , serializeItems());
+}
+
+var serializeItems = function() {
+  var data = {}
+  data.items = []
+  $('.item-row').each(function(index){
+    $('textarea', this).each(function(index){
+      var datatype = $(this).attr('name');
+      if(datatype !== undefined){
+        if(datatype === 'item-name'){
+          item = {}
+        }
+        item[datatype] = $(this).val()
+        if(datatype === 'item-qty'){
+          data.items.push(item)
+        }
+      }
+    })
+  })
+  console.log("data: ",data);
+  return data;
 }
 
 var buildInvoiceList = function() {
@@ -62,6 +120,7 @@ var saveInvoice = function() {
   .done(function(data){
     console.log("Invoice saved", data)
     buildInvoiceList()
+    currentId = data.id;
   })
   .fail(function(data){
     console.log("Invoice not saved", data)
@@ -123,5 +182,15 @@ window.downloadInvoice = function() {
 
   }
 };
+
+ Date.prototype.ddmmyyyy = function() {
+   var yyyy = this.getFullYear().toString();
+   var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
+   var dd  = this.getDate().toString();
+   return (dd[1]?dd:"0"+dd[0]) +'.'+ (mm[1]?mm:"0"+mm[0]) +'.'+ yyyy; // padding
+  };
+
+d = new Date();
+d.ddmmyyyy();
 
 $( init )

@@ -112,10 +112,11 @@ $(document).ready(function() {
   $("#paid").blur(update_balance);
 
   $("body").on('click', '#addrow', function(){
-    $(".item-row:last").after('<tr class="item-row"><td class="item-name"><div class="delete-wpr"><textarea name="item-name">Item Name</textarea><a class="notPartOfInvoice delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td><td class="description"><textarea name="item-desc">Description</textarea></td><td><textarea name="item-cost" class="cost">$0</textarea></td><td><textarea name="item-qty" class="qty">0</textarea></td><td class="priceColumn"><span class="price">$0</span></td></tr>');
+    $(".item-row:last").after('<tr class="item-row"><td class="item-name"><div class="delete-wpr"><textarea name="item-name">Item Name</textarea><a class="notPartOfInvoice delete btn btn-danger" href="javascript:;" title="Remove row">X</a></div></td><td class="description"><textarea name="item-description">Description</textarea></td><td><textarea name="item-cost" class="cost">$0</textarea></td><td><textarea name="item-qty" class="qty">0</textarea></td><td class="priceColumn"><span class="price">$0</span></td></tr>');
     if ($(".delete").length > 0) $(".delete").show();
     $('textarea').autosize();
     bind();
+    onAddRow()
   });
 
   bind();
@@ -124,6 +125,7 @@ $(document).ready(function() {
     $(this).parents('.item-row').remove();
     update_total();
     if ($(".delete").length < 2) $(".delete").hide();
+    onDeleteRow();
   });
 
   $("#cancel-logo").click(function(){

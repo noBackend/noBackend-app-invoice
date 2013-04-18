@@ -13,7 +13,7 @@
 
   <body>
   	<div id="page-wrap">
-
+      <!--
   		<textarea name="header" id="header">INVOICE</textarea>
 
   		<div id="identity">
@@ -22,9 +22,9 @@
 123 Appleseed Street
 Appleville, WI 53719
 
-Phone: (555) 555-5555</textarea><!-- /address -->
+Phone: (555) 555-5555</textarea>
 
-  		</div><!-- /identity -->
+  		</div>
 
   		<div id="customer">
         <textarea name="customer" id="customer-title">Widget Corp.
@@ -45,7 +45,7 @@ c/o Steve Widget</textarea>
           </tr>
         </table>
 
-  		</div><!-- /customer -->
+  		</div>
 
   		<table id="items">
 
@@ -106,12 +106,12 @@ c/o Steve Widget</textarea>
   		<div id="terms">
   		  <h5>Terms</h5>
   		  <textarea name="terms">NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
-  		</div><!-- /terms -->
+  		</div>-->
   	</div>
 
     <div class="footerBar notPartOfInvoice">
       <div class="buttons">
-        <button class="save btn btn-small btn-success">Save</button>
+        <button class="newInvoice btn btn-small btn-success">New invoice</button>
         <span class="btn-group dropup">
           <button class="btn btn-small btn-primary">Your invoices</button>
           <button class="btn btn-small dropdown-toggle btn-primary" data-toggle="dropdown">
@@ -189,14 +189,14 @@ c/o Steve Widget</textarea>
     <script id="invoice" type="text/html">
       <textarea name="header" id="header">{{header}}</textarea>
       <div id="identity">
-        <textarea name="address" id="address">{{address}}</textarea>
+        <textarea name="address" id="address" placeholder="Your address">{{address}}</textarea>
       </div>
       <div id="customer">
-        <textarea name="customer" id="customer-title">{{customer}}</textarea>
+        <textarea name="customer" id="customer-title" placeholder="Your client's address">{{customer}}</textarea>
         <table id="meta">
           <tr>
             <td class="meta-head">Invoice #</td>
-            <td><textarea name="invoiceNr">{{invoiceNr}}</textarea></td>
+            <td><textarea name="invoiceNr" placeholder="00001">{{invoiceNr}}</textarea></td>
           </tr>
           <tr>
             <td class="meta-head">Date</td>
@@ -242,7 +242,7 @@ c/o Steve Widget</textarea>
             <td colspan="2" class="blank"> </td>
             <td colspan="2" class="total-line">Amount Paid</td>
 
-            <td class="total-value"><textarea name="paid" id="paid">{{paid}}</textarea></td>
+            <td class="total-value"><textarea name="paid" id="paid" placeholder="$0.00">{{paid}}</textarea></td>
         </tr>
         <tr>
             <td colspan="2" class="blank"> </td>
@@ -254,7 +254,7 @@ c/o Steve Widget</textarea>
 
       <div id="terms">
         <h5>Terms</h5>
-        <textarea name="terms">NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.</textarea>
+        <textarea name="terms">{{terms}}</textarea>
       </div><!-- /terms -->
     </script>
 
