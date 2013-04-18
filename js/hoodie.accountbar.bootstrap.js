@@ -12,7 +12,7 @@ Hoodie.extend('hoodstrap', (function() {
 
   Hoodstrap.prototype = {
 
-    // 
+    //
     hoodifyAccountBar: function() {
       this.hoodie.account.authenticate().then(this.handleUserAuthenticated.bind(this), this.handleUserUnauthenticated.bind(this));
       this.subscribeToHoodieEvents()
@@ -24,13 +24,13 @@ Hoodie.extend('hoodstrap', (function() {
       this.hoodie.on('account:error:unauthenticated remote:error:unauthenticated', this.handleUserAuthenticationError.bind(this))
     },
 
-    // 
+    //
     handleUserAuthenticated: function(username) {
       $('html').attr('data-hoodie-account-status', 'signedin')
       $('.hoodie-accountbar').find('.hoodie-username').text(username)
     },
 
-    // 
+    //
     handleUserUnauthenticated: function() {
       $('html').attr('data-hoodie-account-status', 'signedout')
     },
@@ -58,7 +58,7 @@ Hoodie.extend('hoodstrap', (function() {
       var $element = $(event.target),
           action   = $element.data('hoodie-action'),
           $form;
-      
+
       switch(action) {
         case 'signup':
           $form = $.modalForm({
@@ -95,7 +95,7 @@ Hoodie.extend('hoodstrap', (function() {
           break
         case 'destroy':
           if( window.confirm("you sure?") ) {
-            window.hoodie.account.destroy()  
+            window.hoodie.account.destroy()
           }
           break
       }
@@ -132,11 +132,11 @@ Hoodie.extend('hoodstrap', (function() {
             break
         }
 
-        magic.done(function() { 
+        magic.done(function() {
           $modal.find('.alert').remove()
           $modal.modal('hide')
         })
-        magic.fail(function(error) { 
+        magic.fail(function(error) {
           $modal.find('.alert').remove()
           $modal.trigger('error', error)
         })

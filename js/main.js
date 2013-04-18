@@ -32,6 +32,7 @@ var init = function() {
     var id = $(this).data('id')
     loadInvoice(id);
   });
+
   $('#page-wrap').on('input change', 'textarea', function(event){
     var data = null;
     if($(this).closest('.item-row').length !== 0){
@@ -43,6 +44,10 @@ var init = function() {
     hoodie.store.update('invoice', currentId , data).done(function(){
       buildInvoiceList();
     })
+  })
+
+  hoodie.account.on('authenticated', function(){
+    setTimeout(buildInvoiceList, 1000, true);
   })
 
   $('.download.btn').click( downloadInvoice )
