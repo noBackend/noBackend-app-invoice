@@ -50,6 +50,7 @@ var init = function() {
   })
 
   $('.download.btn').click( downloadInvoice )
+  $('.email.btn').click( sendInvoice )
   buildInvoiceList();
 }
 
@@ -159,6 +160,10 @@ var currentInvoiceToText = function() {
   return text;
 }
 
+var currentInvoiceNr() {
+  return $.trim($('.invoiceNr').val())
+}
+
 var convertElementToDataUrl = function( el, fileName ) {
   var fileName
   var fileType
@@ -235,7 +240,6 @@ var download = function(uri, fileName) {
   eventFire(link, "click");
 }
 
-
  Date.prototype.ddmmyyyy = function() {
    var yyyy = this.getFullYear().toString();
    var mm = (this.getMonth()+1).toString(); // getMonth() is zero-based
@@ -246,10 +250,14 @@ var download = function(uri, fileName) {
 d = new Date();
 d.ddmmyyyy();
 
-var sendInvoiceTo = function(email) {
+
+var sendInvoice = function(email) {  
+  if (typeof email != "string") {
+    email = prompt("Recipient:")
+  }
   return sendEmail({
     to: email, 
-    subject: 'pierogi!', 
+    subject: 'Invoice #' + currentInvoiceNr, 
     html: currentInvoiceToHTML(), 
     text: currentInvoiceToText(),
     attachments: [ convert( $('.invoiceSheet') ).to("invoice.png") ]
