@@ -56,6 +56,9 @@ var init = function() {
   $('.download.btn').click( downloadInvoice )
   $('.email.btn').click( sendInvoice )
   buildInvoiceList(true);
+  $invoice = $('.invoiceSheet')
+  $downloadButton = $('.download.btn')
+  $emailButton = $('.email.btn')
 }
 
 var onAddRow = function() {
@@ -199,7 +202,7 @@ var currentInvoiceToText = function() {
 }
 
 var currentInvoiceNr = function() {
-  return $.trim($('.invoiceNr').val())
+  return $.trim( $('[name=invoiceNr]').val() )
 }
 
 var convertElementToDataUrl = function( el, fileName ) {
