@@ -17,7 +17,8 @@ var init = function() {
    date: new Date().ddmmyyyy(),
    paid: "$0.00",
    header: "INVOICE",
-   terms: 'NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.'
+   terms: 'NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.',
+   address: "Gregor Martynus\nc/o HUB Zürich\nViaduktstrasse 93-95\nCH-8005 Zurich\nSwitzerland"
   }
   $('textarea').autosize();
   $('button.newInvoice').click(function(event){
@@ -59,6 +60,7 @@ var init = function() {
   $invoice = $('.invoiceSheet')
   $downloadButton = $('.download.btn')
   $emailButton = $('.email.btn')
+  $footerBar = $('.footerBar')
 }
 
 var onAddRow = function() {
@@ -203,6 +205,9 @@ var currentInvoiceToText = function() {
 
 var currentInvoiceNr = function() {
   return $.trim( $('[name=invoiceNr]').val() )
+}
+var currentInvoiceTitle = function() {
+  return  "Invoice " + currentInvoiceNr()
 }
 
 var convertElementToDataUrl = function( el, fileName ) {

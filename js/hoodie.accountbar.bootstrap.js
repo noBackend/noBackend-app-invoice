@@ -21,6 +21,10 @@ Hoodie.extend('hoodstrap', (function() {
     subscribeToHoodieEvents : function() {
       this.hoodie.account.on('authenticated', this.handleUserAuthenticated.bind(this))
       this.hoodie.account.on('signout', this.handleUserUnauthenticated.bind(this))
+      this.hoodie.account.on('signin', function() {
+        $modal.find('.alert').remove()
+        $modal.modal('hide')
+      })
       this.hoodie.on('account:error:unauthenticated remote:error:unauthenticated', this.handleUserAuthenticationError.bind(this))
     },
 

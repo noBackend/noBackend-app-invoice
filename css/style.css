@@ -6,7 +6,7 @@
 * { margin: 0; padding: 0; }
 html{ background: url('../img/pattern.png')}
 html body { font: 14px/1.4 Arial, sans-serif; background: transparent;}
-#page-wrap { width: 800px; padding: 40px; margin: 80px auto 0; background: #FFF; box-shadow: 0 1px 5px rgba(0,0,0,.5);}
+#page-wrap { width: 800px; padding: 20px 40px 40px; margin: 30px auto 0; background: #FFF; box-shadow: 0 1px 5px rgba(0,0,0,.5);}
 
 textarea { border: 0; font: 14px Georgia, Serif; overflow: hidden; resize: none; }
 table { border-collapse: collapse; }
@@ -30,8 +30,7 @@ table td, table th { border: none; padding: 5px; }
 
 #meta { margin-top: 1px; width: 300px; float: right; margin-right: 20px; }
 #meta td { text-align: right;  }
-#meta td.meta-head { text-align: right; background: #eee; padding: 0 20px;
-height: 60px;}
+#meta td.meta-head { text-align: right; background: #eee; padding: 0 20px;}
 #meta td textarea { width: 90%; height: 20px; text-align: right; padding-top: 13px;
 margin: 5px -6px 5px 0px;}
 
@@ -80,4 +79,10 @@ td.priceColumn{
 
 #meta .due{
   margin-right: 0;
+}
+
+/*.hoodie-accountbar,*/
+.email.btn,
+.download.btn {
+  display: none !important;
 }
