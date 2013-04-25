@@ -80,9 +80,3 @@ td.priceColumn{
 #meta .due{
   margin-right: 0;
 }
-
-/*.hoodie-accountbar,*/
-.email.btn,
-.download.btn {
-  display: none !important;
-}
