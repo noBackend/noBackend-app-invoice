@@ -1,4 +1,10 @@
-window.hoodie  = new Hoodie('http://api.editableinvoicehoodie.dev');
+if (location.port == 1234) {
+  window.hoodie  = new Hoodie('http://api.editableinvoicehoodie.dev');  
+} else {
+  window.hoodie  = new Hoodie('http://api.hoodie-invoice.jit.su/');
+}
+
+
 window.store = hoodie.store;
 window.remote = hoodie.remote;
 window.account = hoodie.account;
