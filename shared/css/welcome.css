@@ -1,0 +1,60 @@
+html {
+  font-family: Helvetica, Arial;
+  background: #EAEAEA;
+  color: #333;
+}
+body {
+  margin: 0;
+}
+
+body > header {
+  background: #FFF;
+  padding: 80px 40px;
+  border-bottom: 5px solid #09c;
+}
+body > header h1 {
+  color: #09c;
+  max-width: 900px;
+  margin: 0 auto;
+}
+h1 small {
+  font-size: .6em;
+  display: block;
+  font-weight: normal;
+  color: #333;
+}
+
+.main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.main .screenshot {
+  max-width: 100%;
+}
+
+.solutions .add {
+  background: #e0e0e0;
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-width: 1px 0;
+}
+
+a {
+  color: #09c;
+}
+a:focus,
+a:hover {
+  text-decoration: none;
+}
+
+body > footer {
+  background: #333;
+  color: #ddd;
+  padding: 40px;
+}
+body > footer p {
+  max-width: 900px;
+  margin: 0 auto;
+}

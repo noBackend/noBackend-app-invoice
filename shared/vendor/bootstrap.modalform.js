@@ -4,7 +4,7 @@
 
   $( function() {
     var modalId = "modal-form-" + parseInt(Math.random() * 1000, 10);
-    var $cont = $('<div id="'+modalId+'"></div>');
+    var $cont = $('<div id="'+modalId+'" class="modalForm"></div>');
     $('body').append( $cont );
 
     $.modalForm = function(options) {

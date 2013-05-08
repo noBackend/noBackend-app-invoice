@@ -1,0 +1,169 @@
+/*
+  based on work by Chris Coyier (http://css-tricks.com/editable-invoice-v2/)
+*/
+
+* { margin: 0; padding: 0; }
+html{ background: url('../img/pattern.png')}
+html body { font: 14px/1.4 Arial, sans-serif; background: transparent;}
+.invoiceSheet { width: 800px; padding: 20px 40px 40px; margin: 30px auto 0; background: #FFF; box-shadow: 0 1px 5px rgba(0,0,0,.5);}
+
+textarea { border: 0; font: inherit; overflow: hidden; resize: none; }
+table { border-collapse: collapse; }
+table td, table th { border: none; padding: 5px; }
+table td[colspan] { text-align: right;}
+
+.header { height: 15px; width: 100%; margin: 20px 0; background: #222; text-align: center; color: white; font: bold 15px Helvetica, Sans-Serif; text-decoration: uppercase; letter-spacing: 20px; padding: 9px 0 0 0; }
+
+.address { width: 250px; height: 150px; float: left; }
+.customer { overflow: hidden; clear: both;}
+
+.meta { margin-top: 1px; width: 300px; float: right; margin-right: 20px; }
+.meta td { text-align: right;  }
+.meta td.meta-head { text-align: right; background: #eee; padding: 0 20px;}
+.meta td textarea { width: 90%; height: 20px; text-align: right; padding-top: 13px;
+margin: 5px -6px 5px 0px;}
+
+.items { clear: both; width: 100%; margin: 30px 0 0 0; border: none; }
+.items th { background: #eee; text-align: left;
+padding-left: 10px;}
+.items textarea { width: 80px; height: 16px; width: 90%; padding-top: 13px;}
+.items tr.item-row td { border: 0; vertical-align: top; }
+.items td.description { width: 300px; }
+.items td.item-name { width: 175px; }
+.items td.description textarea, .items td.item-name textarea { width: 90%; }
+.items td.total-line { border-right: 0; text-align: right; }
+.items td.total-value { border-left: 0; padding: 10px; padding: 10px 20px 10px 10px; }
+.items td.total-value textarea { height: 20px; background: none; margin: 5px -3px; text-align: right;}
+.items td.balance { background: #eee; }
+.items td.blank { border: 0; }
+
+.terms { text-align: center; margin: 80px 0 0 0; }
+.terms h5 { text-transform: uppercase; font: 13px Helvetica, Sans-Serif; letter-spacing: 10px; border-bottom: 1px solid black; padding: 0 0 8px 0; margin: 0 0 8px 0; }
+.terms textarea { width: 100%; text-align: center;}
+
+textarea, textarea:hover, textarea:focus { 
+  border: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -o-box-shadow: none;
+  box-shadow: none;
+}
+textarea:hover, textarea:focus { 
+  background-color:#FF8;
+}
+textarea.header:hover, textarea.header:focus { 
+  background-color:#000;
+}
+
+.delete-wpr { position: relative; }
+.delete { 
+  display: block; 
+  position: absolute; 
+  font-weight: bold; 
+  padding: 0 3px; 
+  left: 802px;
+  top: 11px;
+  font-family: Verdana; 
+  font-size: 12px;
+  border-radius: 50%;
+  height: 19px;
+  width: 20px;
+  padding: 1px 0 0 0;
+}
+
+.price{
+  line-height: 46px;
+  padding-right: 20px;
+}
+
+.items th {
+  white-space: nowrap;
+}
+.items .descriptionColumn{
+  width: 400px;
+}
+.items .priceColumn {
+  text-align: right;
+}
+.items .costColumn,
+.items .quantityColumn,
+.items .priceColumn {
+  text-align: right;
+}
+
+.items .item-cost,
+.items .item-quantity {
+  text-align: right;
+}
+.items .item-total {
+  display: block;
+  padding: 13px 0;
+}
+.items tfoot tr {
+  border-top: 2px solid #eee;
+}
+
+
+/* hide contents until we know if user is signed in or not */
+body .account-signedin,
+/*body .account-signedout,*/
+body[data-account-status=signedin]  .account-signedout,
+body[data-account-status=error]  .account-signedout,
+body .account-error {
+  display: none;
+}
+
+body[data-account-status=signedin]  .account-signedin,
+body[data-account-status=error]     .account-error,
+body[data-account-status=signedout] .account-signedout {
+  display: block;
+}
+
+.accountbar {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  margin-right: 0;
+  color: white;
+}
+
+.account-signedin{
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.accountbar .username{
+  margin-right: 10px;
+}
+
+.footerBar{
+  display: block;
+  width: 100%;
+  height: 40px;
+  background: #333;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.footerBar .buttons{
+  display: block;
+  position: relative;
+  width: 880px;
+  margin: 0 auto;
+}
+
+.footerBar .buttons>.btn,
+.footerBar .buttons>.btn-group{
+  margin-top: 7px;
+  margin-right: 6px;
+}
+
+
+
+
+.dropup .dropdown-menu.invoiceList{
+  left: 0;
+  width: auto;
+  right: auto;
+}
