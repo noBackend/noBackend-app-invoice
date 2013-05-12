@@ -28,6 +28,10 @@ $('document').ready( function() {
   hoodie.account.on('authenticated', App.renderUserSignedIn)
   hoodie.account.on('signout', App.renderUserSignedOut)
   hoodie.on('account:error:unauthenticated remote:error:unauthenticated', App.renderUserAuthenticationError)
+
+  hoodie.remote.on('add:invoice', handleNewInvoiceFromRemote)
+  hoodie.remote.on('remove:invoice', handleRemovedInvoiceFromRemote)
+  hoodie.remote.on('change:invoice', handleChangedInvoiceFromRemote)
 });
 
 var renderApp = function(invoices) {
@@ -86,4 +90,17 @@ var handleResetPassword = function(inputs) {
 };
 var handleAccountDestroy = function() {
   hoodie.account.destroy()
+};
+
+var handleNewInvoiceFromRemote = function( invoice ) {
+  App.addInvoice( invoice )
+  App.renderInvoiceList()
+};
+var handleRemovedInvoiceFromRemote = function( invoice ) {
+  App.removeInvoice( invoice )
+  App.renderInvoiceList()
+};
+var handleChangedInvoiceFromRemote = function(invoice) { 
+  App.updateInvoice( invoice )
+  App.renderInvoiceList()
 };

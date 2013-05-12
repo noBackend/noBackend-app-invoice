@@ -1,8 +1,8 @@
 Editable Invoice
 ==================
 
-<a href="http://gr2m.github.io/EditableInvoice/">
-![Screenshost](https://raw.github.com/gr2m/EditableInvoice/gh-pages/img/editable-invoice-screenshot.png)
+<a href="http://nobackend.github.io/example-invoice/">
+![Screenshost](http://nobackend.github.io/example-invoice/shared/img/screenshot.png)
 </a>
 
 The very first [noBackend](http://nobackend.org/) example app, to showcase how an HTML prototype can be turned into a real product in a matter of hours.

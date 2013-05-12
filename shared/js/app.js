@@ -51,6 +51,22 @@ App = {
     return invoice;
   },
 
+  removeInvoice : function( id ) {
+    if (typeof id === 'object') {
+      id = id.id;
+    }
+    var currentInvoiceId = this.currentInvoice.id
+    this.invoices.forEach( function( invoice, index) {
+      if (invoice.id === id) {
+        this.invoices.splice(index, 1);
+      }
+    }, this );
+    if (currentInvoiceId === id) {
+      this.showLastInvoice()
+    }
+    return this;
+  },
+
   addNewInvoiceAndRender : function() {
     var invoice = this.addInvoice();
     this.showLastInvoice();
@@ -101,6 +117,15 @@ App = {
       this.currentInvoice.on('delete', this.handleInvoiceDelete.bind(this));
     } else {
       alert("invoice could not be found (id="+id+")");
+    }
+  },
+
+  updateInvoice : function(properties) {
+    var invoice = this.findInvoice( properties.id );
+    if (invoice) {
+      for ( var property in properties) {
+        invoice.property = property;
+      }
     }
   },
 
@@ -180,11 +205,7 @@ App = {
     this.trigger('invoice:save', properties);
   },
   handleInvoiceDelete : function(properties) {
-    this.invoices.forEach( function( invoice, index) {
-      if (invoice.id === properties.id) {
-        this.invoices.splice(index, 1);
-      }
-    }.bind(this) );
+    this.removeInvoice( properties )
     this.trigger('invoice:delete', properties);
   }
 };
@@ -193,8 +214,10 @@ App = {
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 App.init = __bind(App.init, App)
 App.addInvoice = __bind(App.addInvoice, App)
+App.removeInvoice = __bind(App.removeInvoice, App)
 App.renderUserSignedIn = __bind(App.renderUserSignedIn, App)
 App.renderUserSignedOut = __bind(App.renderUserSignedOut, App)
 App.renderUserAuthenticationError = __bind(App.renderUserAuthenticationError, App)
+App.renderInvoiceList = __bind(App.renderInvoiceList, App)
 
 $('document').ready( App.init )
