@@ -1,7 +1,7 @@
 
 var sc; // sockethub connection instance
 SockethubClient.connect({
-  host: 'ws://localhost:10550/sockethub',
+  host: 'wss://silverbucket.net:443/sockethub',
   confirmationTimeout: 3000
 }).then(function (connection) {
   sc = connection;
@@ -117,7 +117,7 @@ var handleInvoiceSend = function (invoice) {
     };
 
 
-    return sc.set('email', creds).then(function () {
+    sc.set('email', creds).then(function () {
       console.log('successfully set smtp credentials');
       var recipient = prompt("Recipient: ");
       if (! recipient)
