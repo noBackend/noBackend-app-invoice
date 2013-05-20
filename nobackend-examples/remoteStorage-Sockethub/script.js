@@ -79,6 +79,12 @@ var handleInvoiceSave = function(properties) {
 var handleInvoiceDelete = function(properties) {
   console.log('handleInvoiceDelete');
 
+  if (!invoices.setContent) { return false; }
+  invoices.setContent(properties.id, '').then(function () {
+    console.log('invoice deleted!');
+  }, function (err) {
+    console.log('failed to delete invoice ', err, properties);
+  });
 };
 var handleInvoiceDownload = function(invoice) {
   console.log('handleInvoiceDownload');
