@@ -103,9 +103,11 @@ var handleInvoiceSend = function (invoice) {
     var creds = {};
     creds['credentials'] = {};
     creds['credentials'][inputs.email] = {
-      username: inputs.username,
-      password: inputs.password,
-      host: inputs.host
+      'smtp': {
+        username: inputs.username,
+        password: inputs.password,
+        host: inputs.host
+      }
     };
 
 
