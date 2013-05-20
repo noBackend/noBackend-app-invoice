@@ -80,7 +80,7 @@
       } else {
         cmds[rid].confirmed = new Date().getTime();
       }
-      console.log('CMDS:', cmds);
+      //console.log('CMDS:', cmds);
     }
     var _this = this;
 
