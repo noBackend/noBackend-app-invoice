@@ -44,6 +44,7 @@ $('document').ready( function() {
   remoteStorage.util.silenceAllLoggers();
   remoteStorage.claimAccess({documents:'rw'}).then(function () {
     remoteStorage.displayWidget('remotestorage-connect');
+    remoteStorage.documents.init();
     invoices = remoteStorage.documents.getPrivateList('invoices');
 
     invoices.getAll().then(function (list) {
@@ -52,15 +53,14 @@ $('document').ready( function() {
       }
     });
 
-    /*invoices.on('change', function () {
+    invoices.on('change', function () {
       console.log('RS onChange fired!', arguments);
     });
 
     invoices.on('error', function () {
       console.log('RS onError fired!', arguments);
-    });*/
+    });
   });
-
 
 });
 
@@ -94,17 +94,14 @@ var handleInvoiceSend = function (invoice) {
   console.log('handleInvoiceSend');
   if (!sc.isConnected()) { return false; }
 
-
-  var from;
-
   $.modalForm({
-    title: 'SMTP Credentials',
+    title: 'SMTP Credentials<p style="font-size: 12px;"><i>(all data encrypted, and after this session is deleted)</i></p>',
     fields: [ 'email', 'username', 'password', 'host' ],
     submit: 'Save'
   }).on('submit', function(event, inputs) {
     // event.target => <div class="modal">
     // inputs       => { username, password }
-    from = inputs.email;
+    var from = inputs.email;
 
     var creds = {};
     creds['credentials'] = {};
@@ -116,13 +113,14 @@ var handleInvoiceSend = function (invoice) {
       }
     };
 
-
+    // set email credentials
     sc.set('email', creds).then(function () {
       console.log('successfully set smtp credentials');
       var recipient = prompt("Recipient: ");
       if (! recipient)
         return;
 
+      // submit email message to sockethub for delivery
       sc.submit({
         platform: 'email',
         verb: 'send',

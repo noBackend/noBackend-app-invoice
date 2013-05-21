@@ -1,15 +1,8 @@
 (function() {
   var moduleName = 'documents';
 
-  remoteStorage.defineModule(moduleName, function(myBaseClient) {
-    var errorHandlers=[];
-    function fire(eventType, eventObj) {
-      if(eventType == 'error') {
-        for(var i=0; i<errorHandlers.length; i++) {
-          errorHandlers[i](eventObj);
-        }
-      }
-    }
+  remoteStorage.defineModule(moduleName, function(privateClient, publicClient) {
+
     function getUuid() {
       var uuid = '',
       i,
@@ -24,16 +17,23 @@
       }
       return uuid;
     }
+
+    function init() {
+      privateClient.release('');
+      publicClient.release('');
+    }
+
     function getPrivateList(listName) {
-      myBaseClient.use(listName+'/');
+      privateClient.use(listName+'/');
+
       function getIds() {
-        return myBaseClient.getListing(listName+'/');
+        return privateClient.getListing(listName+'/');
       }
       function getAll() {
-        return myBaseClient.getAll(listName + '/');
+        return privateClient.getAll(listName + '/');
       }
       function getContent(id) {
-        return myBaseClient.getObject(listName+'/'+id).
+        return privateClient.getObject(listName+'/'+id).
           then(function(obj) {
             return obj ? obj.content : '';
           });
@@ -45,37 +45,44 @@
       }
       function setContent(id, content) {
         if(content === '') {
-          return myBaseClient.remove(listName+'/'+id);
+          return privateClient.remove(listName+'/'+id);
         } else {
-          return myBaseClient.storeObject('text', listName+'/'+id, {
+          return privateClient.storeObject('text', listName+'/'+id, {
             content: content
           });
         }
       }
       function add(content) {
         var id = getUuid();
-        return myBaseClient.storeObject('text', listName+'/'+id, {
+        return privateClient.storeObject('text', listName+'/'+id, {
           content: content
         }).then(function() {
           return id;
         });
       }
       function on(eventType, cb) {
-        myBaseClient.on(eventType, cb);
-        if(eventType == 'error') {
-          errorHandlers.push(cb);
-        }
+        privateClient.on(eventType, function (event) {
+          if (event.path.substr(2+moduleName.length, listName.length) === listName) {
+            cb(event);
+          }
+        });
       }
       function set(id, obj) {
-        return myBaseClient.storeObject('text', listName+'/'+id, obj);
+        return privateClient.storeObject('text', listName+'/'+id, obj);
       }
       function get(id) {
-        return myBaseClient.getObject(listName+'/'+id).
+        return privateClient.getObject(listName+'/'+id).
           then(function(obj) {
             return obj || {};
           });
       }
+
+      function remove(id) {
+        return privateClient.remove(listName+'/'+id);
+      }
+
       return {
+        init          : init,
         getIds        : getIds,
         getAll        : getAll,
         getContent    : getContent,
@@ -84,7 +91,8 @@
         set           : set,
         get           : get,
         add           : add,
-        on            : on
+        on            : on,
+        remove        : remove
       };
     }
 
@@ -102,6 +110,7 @@
         "item documents/notes/personal": "used by docrastinate for the 'personal' pane"
       },
       exports: {
+        init: init,
         getPrivateList: getPrivateList,
         onChange: function(listName, callback) {
           myBaseClient.on('change', function(event) {
