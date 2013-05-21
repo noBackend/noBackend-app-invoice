@@ -127,6 +127,14 @@ body[data-account-status=signedout] .account-signedout {
   color: white;
 }
 
+.about {
+  position: absolute;
+  top: 12px;
+  right: -30px;
+  margin-right: 0;
+  color: white;
+}
+
 .account-signedin{
   font-size: 12px;
   line-height: 24px;
@@ -158,9 +166,6 @@ body[data-account-status=signedout] .account-signedout {
   margin-top: 7px;
   margin-right: 6px;
 }
-
-
-
 
 .dropup .dropdown-menu.invoiceList{
   left: 0;
