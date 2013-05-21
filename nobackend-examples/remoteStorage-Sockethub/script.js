@@ -95,17 +95,14 @@ var handleInvoiceSend = function (invoice) {
   console.log('handleInvoiceSend');
   if (!sc.isConnected()) { return false; }
 
-
-  var from;
-
   $.modalForm({
-    title: 'SMTP Credentials',
+    title: 'SMTP Credentials<p style="font-size: 12px;"><i>(all data encrypted, and after this session is deleted)</i></p>',
     fields: [ 'email', 'username', 'password', 'host' ],
     submit: 'Save'
   }).on('submit', function(event, inputs) {
     // event.target => <div class="modal">
     // inputs       => { username, password }
-    from = inputs.email;
+    var from = inputs.email;
 
     var creds = {};
     creds['credentials'] = {};
