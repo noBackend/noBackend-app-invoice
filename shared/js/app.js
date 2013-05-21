@@ -201,7 +201,6 @@ App = {
   },
 
   handleInvoiceSave : function(properties) {
-    console.log( "saving", properties, properties.id)
     this.trigger('invoice:save', properties);
   },
   handleInvoiceDelete : function(properties) {
