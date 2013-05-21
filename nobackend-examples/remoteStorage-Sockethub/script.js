@@ -62,7 +62,6 @@ $('document').ready( function() {
     });
   });
 
-
 });
 
 
@@ -114,13 +113,14 @@ var handleInvoiceSend = function (invoice) {
       }
     };
 
-
+    // set email credentials
     sc.set('email', creds).then(function () {
       console.log('successfully set smtp credentials');
       var recipient = prompt("Recipient: ");
       if (! recipient)
         return;
 
+      // submit email message to sockethub for delivery
       sc.submit({
         platform: 'email',
         verb: 'send',
