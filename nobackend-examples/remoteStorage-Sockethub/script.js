@@ -44,6 +44,7 @@ $('document').ready( function() {
   remoteStorage.util.silenceAllLoggers();
   remoteStorage.claimAccess({documents:'rw'}).then(function () {
     remoteStorage.displayWidget('remotestorage-connect');
+    remoteStorage.documents.init();
     invoices = remoteStorage.documents.getPrivateList('invoices');
 
     invoices.getAll().then(function (list) {
@@ -52,13 +53,13 @@ $('document').ready( function() {
       }
     });
 
-    /*invoices.on('change', function () {
+    invoices.on('change', function () {
       console.log('RS onChange fired!', arguments);
     });
 
     invoices.on('error', function () {
       console.log('RS onError fired!', arguments);
-    });*/
+    });
   });
 
 
