@@ -4,6 +4,10 @@
     <meta charset="utf-8">
 
     <title>noBackend Invoice</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu:400,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
+
     <link rel='stylesheet' href='shared/css/welcome.css' />
   </head>
 
@@ -11,9 +15,11 @@
 
     <header>
       <h1>
-        noBackend Invoice<br>
-        <small>Helping you to select a noBackend Solution</small>
+        <strong>noBackend Invoice</strong><br>
+        <small>One app, many backends. Pick yours!</small>
       </h1>
+
+      <div class="screenshot" title="noBackend Invoice"></div>
     </header>
 
     <div class="main">
@@ -31,7 +37,7 @@
         <a href="http://css-tricks.com/editable-invoice-v2/">EditAbleInvoice</a>
         as a proof of concept for a static HTML based application. It lets you
         edit and print an invoice. As it's HTML only, every frontend developer
-        is capable to copy the files and adjust them to his/her own preference.
+        is capable to copy the files and adjust them to own preference.
         But it has no support for typical backend features like user accounts,
         emails or exports.
       </p>
@@ -39,11 +45,7 @@
       <p>
         We now add these features with noBackend solutions, meaning we add e.g.
         user accounts by writing frontend JavaScript code only:
-
-        <img src="shared/img/screenshot.png" class="screenshot">
       </p>
-
-
 
       <section class="solutions">
         <header>
@@ -58,42 +60,43 @@
         <article id="hoodie">
           <h3>Hoodie</h3>
           <p>
-            Hoodie adds features for user accounts, exporting the current invoice
+            <a href="http://hood.ie">Hoodie</a> adds features for user accounts, exporting the current invoice
             and sending it via multipart email.
           </p>
           <p>
-            <a href="nobackend-examples/hoodie/index.html">open hoodie invoice</a>
-            | <a href="http://hood.ie">Hoodie website</a>
+            <a href="nobackend-examples/hoodie/index.html">open app</a>
+            | <a href="https://github.com/noBackend/example-invoice/blob/gh-pages/nobackend-examples/hoodie/script.js">view source</a>
           </p>
         </article>
 
         <article id="remotestorage-sockethub">
           <h3>remoteStorage + Sockethub</h3>
           <p>
-            remoteStorage provides per-user storage that the user gives the app
+            <a href="http://remotestorage.io">remoteStorage</a> provides per-user storage that the user gives the app
             permission to store/retreive documents from.
-            Sockethub provides either per-user or per-app messaging and other back-end
+            <a href="http://sockethub.org">Sockethub</a> provides either per-user or per-app messaging and other back-end
             functionality.
           </p>
           <p>
-            <a href="nobackend-examples/remoteStorage-Sockethub/index.html">open rs+sh invoice</a>
-            | <a href="http://remotestorage.io">remoteStorage website</a>
-             <a href="http://sockethub.org">Sockethub website</a>
+            <a href="nobackend-examples/remoteStorage-Sockethub/index.html">open app</a>
+            | <a href="https://github.com/noBackend/example-invoice/blob/gh-pages/nobackend-examples/remoteStorage-Sockethub/script.js">view source</a>
           </p>
         </article>
 
 
-        <article class="add">
+        <article class="box">
           <p>
             There are many other <a href="http://nobackend.org/solutions">noBackend solutions</a>
-            out there today. Help us by adding an implementation. Get in touch at <a href="http://twitter.com/noBackend">@noBackend</a>
+            out there today. Help us by adding another implementation. Get in touch at <a href="http://twitter.com/noBackend">@noBackend</a>
           </p>
         </article>
       </section>
     </div>
 
     <footer>
-      <p>brought to you by {\o/} <a href="http://nobackend.org">noBackend</a>. Feedback? Tweet us <a href="http://twitter.com/noBackend">@noBackend</a></p>
+      <p>
+        © noBackend.org. Licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">cc-by-sa</a>
+      </p>
     </footer>
   </body>
 </html>

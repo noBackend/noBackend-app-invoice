@@ -1,7 +1,9 @@
 html {
-  font-family: Helvetica, Arial;
-  background: #EAEAEA;
-  color: #333;
+  font-family: Ubuntu, sans-serif;
+  color: #222;
+  line-height: 1.7em;
+  font-size: 1.2em;
+  background: #E1D8D0;
 }
 body {
   margin: 0;
@@ -9,52 +11,195 @@ body {
 
 body > header {
   background: #FFF;
-  padding: 80px 40px;
-  border-bottom: 5px solid #09c;
+  color: #FFF;
+  
+  position: relative;
+  overflow: hidden;
+  height: 450px;
+  /*height: 300px;*/
+
+  border-bottom: 10px solid #2A121C;
+
+  position: relative;
+  padding: 5%;
+  background: #73304C;
+  background: -moz-radial-gradient(50% 50%, circle cover, #B7527C 0%, #73304C 100%);
+  background: -webkit-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
+  background: -o-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
+  background: -ms-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
+  background: radial-gradient(circle at 50% 50%, #B7527C 0%,#73304C 100%);
 }
+
 body > header h1 {
-  color: #09c;
   max-width: 900px;
   margin: 0 auto;
+  z-index: 2;
+  position: absolute;
+  bottom: 10%;
+}
+body > header .screenshot {
+  position: absolute;
+  left: 20%;
+  
+  z-index: 1;
+
+  width: 768px;
+  height: 525px;
+  background: url(../img/screenshot.png);
+  background-size: contain !important;
+  box-shadow: 0 -22px 35px rgba(0,0,0,.7);
+  bottom: -30px;
+}
+body > header .screenshot:before {
+  content: attr(title);
+  text-align: center;
+  color: #222;
+  text-shadow: 1px 1px 0 rgba(255,255,255,.6);
+  display: block;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to bottom, #FFF 0%, #f0f0f0 5%, #D0D0D0 100%);;
+  border: 1px solid #ccc;
+  border-color: #cecece #c2c2c2 #B4B4B4;
+  box-shadow: 0 0 2px rgba(0,0,0,.3);
+  border-radius: 3px 3px 0 0;
+
+  top: -32px;
+  font-size: 15px;
+  line-height: 30px;
 }
 h1 small {
-  font-size: .6em;
-  display: block;
+  font-size: .5em;
   font-weight: normal;
-  color: #333;
+  color: #eee;
+  background: rgba(0,0,0,.7);
+  padding: .4em;
+  float: left;
+}
+h1 strong {
+  padding: .2em;
+  float: left;
+  background: rgba(0,0,0,.7);
 }
 
 .main {
   max-width: 900px;
   margin: 0 auto;
   padding: 40px;
-}
+  position: relative;
+  z-index: 2;
 
-.main .screenshot {
-  max-width: 100%;
-}
-
-.solutions .add {
-  background: #e0e0e0;
-  padding: 10px;
-  border: 1px solid #bbb;
-  border-width: 1px 0;
+  background: url(../img/noBackend_bg.png) 50% 50% no-repeat;
+  background-size: contain;
 }
 
 a {
-  color: #09c;
+  color: inherit;
 }
 a:focus,
 a:hover {
+  color: #73304C;
   text-decoration: none;
 }
 
+img {
+  max-width: 100%
+}
+
+p, li {
+  max-width: 50em;
+}
+
+hr {
+  border-color: #CDBEB1;
+  border-style: solid none;
+  border-width: 1px 0 0;
+  margin: 18px 0;
+}
+
+pre[class] {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  background: #FFF;
+  position: relative;
+  line-height: 1.3em;
+  padding: 1em 0;
+  font-family: 'Ubuntu Mono', Consolas, Monaco, 'Andale Mono', monospace;
+  display: block;
+  margin: 0 -5.56%;
+  padding: 1em 5.56%;
+}
+
 body > footer {
-  background: #333;
+  background: #2A121C;
   color: #ddd;
   padding: 40px;
 }
 body > footer p {
   max-width: 900px;
   margin: 0 auto;
+}
+
+
+.box {
+  background: #FFF;
+  border: 1px solid #CDBEB1;
+  border-width: 1px 0;
+  padding: 1em;
+}
+.box h3,
+.box p {
+  margin: 0;
+}
+
+@media only screen and (max-width: 640px) {
+  html {
+    font-size: .8em;
+  }
+
+  body > header {
+    height: 150px;
+  }
+  body > header .screenshot {
+    bottom: -10px;
+    left: 30%;
+
+    width: 256px;
+    height: 175px;
+    background: url(../img/screenshot.png);
+    box-shadow: 0 -12px 15px rgba(0,0,0,.7);
+  }
+
+  body > header .screenshot:before {
+    font-size: 6px;
+    line-height: 10px;
+    top: -12px;
+  }
+}
+
+@media only screen and (max-width: 1000px) and (min-width: 640px) {
+  html {
+    font-size: 1em;
+  }
+
+  body > header {
+    height: 300px;
+  }
+  body > header .screenshot {
+    bottom: -20px;
+    left: 25%;
+
+    width: 512px;
+    height: 350px;
+    background: url(../img/screenshot.png);
+    box-shadow: 0 -22px 35px rgba(0,0,0,.7);
+  }
+
+  body > header .screenshot:before {
+    font-size: 10px;
+    line-height: 20px;
+    top: -22px;
+  }
 }
