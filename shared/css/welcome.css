@@ -3,7 +3,7 @@ html {
   color: #222;
   line-height: 1.7em;
   font-size: 1.2em;
-  background: #E1D8D0;
+  background: url(../img/noise.png), #E1D8D0;
 }
 body {
   margin: 0;
@@ -23,11 +23,11 @@ body > header {
   position: relative;
   padding: 5%;
   background: #73304C;
-  background: -moz-radial-gradient(50% 50%, circle cover, #B7527C 0%, #73304C 100%);
-  background: -webkit-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
-  background: -o-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
-  background: -ms-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
-  background: radial-gradient(circle at 50% 50%, #B7527C 0%,#73304C 100%);
+  background: url(../img/noise.png), -moz-radial-gradient(50% 50%, circle cover, #B7527C 0%, #73304C 100%);
+  background: url(../img/noise.png), -webkit-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
+  background: url(../img/noise.png), -o-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
+  background: url(../img/noise.png), -ms-radial-gradient(50% 50%, circle cover, #B7527C 0%,#73304C 100%);
+  background: url(../img/noise.png), radial-gradient(circle at 50% 50%, #B7527C 0%,#73304C 100%);
 }
 
 body > header h1 {
@@ -60,7 +60,7 @@ body > header .screenshot:before {
   bottom: 100%;
   left: 0;
   right: 0;
-  background: linear-gradient(to bottom, #FFF 0%, #f0f0f0 5%, #D0D0D0 100%);;
+  background: url(../img/noise.png), linear-gradient(to bottom, #FFF 0%, #f0f0f0 5%, #D0D0D0 100%);
   border: 1px solid #ccc;
   border-color: #cecece #c2c2c2 #B4B4B4;
   box-shadow: 0 0 2px rgba(0,0,0,.3);
