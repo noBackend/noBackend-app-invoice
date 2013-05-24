@@ -45,9 +45,11 @@ body > header .screenshot {
 
   width: 768px;
   height: 525px;
-  background: url(../img/screenshot.png);
+  background: #FFF url(../img/screenshot.png);
+  border-top: 32px solid #ddd;
+  border-radius: 5px 5px 0 0;
   background-size: contain !important;
-  box-shadow: 0 -22px 35px rgba(0,0,0,.7);
+  box-shadow: 0 0 35px rgba(0,0,0,.7);
   bottom: -30px;
 }
 body > header .screenshot:before {
@@ -69,6 +71,18 @@ body > header .screenshot:before {
   top: -32px;
   font-size: 15px;
   line-height: 30px;
+}
+body > header .screenshot:after {
+  content: '×';
+  font-weight: bold;
+  display: block;
+  position: absolute;
+  right: 1.6%;
+  bottom: 100%;
+  line-height: 33px;
+
+  color: #222;
+  text-shadow: 1px 1px 0 rgba(255,255,255,.6);
 }
 h1 small {
   font-size: .5em;
@@ -169,13 +183,17 @@ body > footer p {
     width: 256px;
     height: 175px;
     background: url(../img/screenshot.png);
-    box-shadow: 0 -12px 15px rgba(0,0,0,.7);
+    box-shadow: 0 0 15px rgba(0,0,0,.7);
+    border-top-width: 12px;
   }
 
   body > header .screenshot:before {
     font-size: 6px;
     line-height: 10px;
     top: -12px;
+  }
+  body > header .screenshot:after {
+    line-height: 13px;
   }
 }
 
@@ -194,12 +212,16 @@ body > footer p {
     width: 512px;
     height: 350px;
     background: url(../img/screenshot.png);
-    box-shadow: 0 -22px 35px rgba(0,0,0,.7);
+    box-shadow: 0 0 35px rgba(0,0,0,.7);
+    border-top-width: 22px;
   }
 
   body > header .screenshot:before {
     font-size: 10px;
     line-height: 20px;
     top: -22px;
+  }
+  body > header .screenshot:after {
+    line-height: 23px;
   }
 }
