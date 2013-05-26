@@ -4,7 +4,7 @@ remoteStorge/Sockethub Implementation
 The remoteStorge/Sockethub Implementation for the invoice app
 has been brought to you by Nick Jennings.
 
-Nick ([@silverbucket](https://github.com/silverbucket))
+Nick ([silverbucket](https://github.com/silverbucket))
 is the core developer behind [Sockethub](http://sockethub.org/)
 and a contributer to [remoteStorage](http://remotestorage.io/).
 
@@ -22,11 +22,7 @@ provide access to it across multiple applications.
 About Sockethub
 ---------------
 
-[Sockethub](http://sockethub.org/) aims to implement a polyglot
-(speaking all the languages of the interwebs) approach to social
-and other interactive messaging applications, and assist unhosted
-web app developers by providing server-independent, server-side
-functionality.
+[Sockethub](http://sockethub.org/) is a polyglot (speaking many different protocols and APIs) messaging service for social and other interactive messaging applications. Not only does it assist unhosted web app developers by providing server-independent, server-side functionality, but it also can be used a tool for many different applications, large and small.
 
 
 About unhosted web apps
