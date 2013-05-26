@@ -57,7 +57,6 @@ $('document').ready( function() {
   App.on('invoice:delete', handleInvoiceDelete);
   App.on('invoice:send', handleInvoiceSend);
 
-  App.render();
 
   remoteStorage.util.silenceAllLoggers();
   // request 'rw' access to the documents module
@@ -75,6 +74,7 @@ $('document').ready( function() {
       for (var key in list) {
         App.addInvoice(list[key].content);
       }
+      App.render();
     });
 
     // Below are two event listeners, which are currently unused
@@ -85,6 +85,7 @@ $('document').ready( function() {
     invoices.on('error', function () {
       console.log('RS onError fired!', arguments);
     });
+    
   });
 
 });
