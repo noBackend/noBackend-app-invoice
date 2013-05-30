@@ -13,7 +13,8 @@ The code is quite hacky at the moment, we gratefully accept pull requests ;-)
 Vision
 ------
 
-Besides the current implementation with [Hoodie](http://hood.ie), we want to add implementations with other noBackend solutions, like (remoteStorage)[http://remotestorage.io/], (deployd)[http://deployd.com/] and (kinvey)[http://www.kinvey.com/]. 
+Besides the current implementation with [Hoodie](http://hood.ie) and [remoteStorage](http://remotestorage.io/) + [sockethub](http://sockethub.org/),
+ we want to add implementations with other noBackend solutions, like [deployd](http://deployd.com/), [Firebase](https://www.firebase.com/) and [Kinvey](http://www.kinvey.com/).
 
 Think of it as [TodoMVC](http://todomvc.com/) for noBackend solutions.
 
