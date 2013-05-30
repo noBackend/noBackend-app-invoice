@@ -1,8 +1,8 @@
 Editable Invoice
 ==================
 
-<a href="http://nobackend.github.io/nobackend-app-invoice/">
-![Screenshost](http://nobackend.github.io/nobackend-app-invoice/shared/img/screenshot.png)
+<a href="http://invoice.nobackend.org/">
+![Screenshost](http://invoice.nobackend.org/shared/img/screenshot.png)
 </a>
 
 The very first [noBackend](http://nobackend.org/) example app, to showcase how an HTML prototype can be turned into a real product in a matter of hours.
