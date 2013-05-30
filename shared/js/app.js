@@ -4,7 +4,9 @@ App = {
     this.accountBar = new AccountBar( $('.accountbar') );
     this.reset()
     this.bindToEvents();
-    this.bindToAccountBarEvents();
+
+    // bootstrap
+    store.findAll('invoice').then( this.addInvoicesAndRender )
   },
 
   reset : function() {
@@ -15,34 +17,13 @@ App = {
 
   bindToEvents : function() {
     this.$el.unbind();
-    this.$el.on('click', '[data-action=newInvoice]', this.addNewInvoiceAndRender.bind(this) );
-    this.$el.on('click', '[data-action=showInvoice]',   function(event) {
-      event.preventDefault();
-      var $el = $(event.currentTarget).closest('[data-id]');
-      var id  = $el.data('id');
-      this.showInvoice(id);
-    }.bind(this));
+    this.$el.on('click', '[data-action=newInvoice]', this.addNewInvoiceAndRender.bind(this));
+    this.$el.on('click', '[data-action=showInvoice]', this.handleShowInvoice.bind(this));
     this.$el.on('click', '[data-action=deleteInvoice]', this.deleteCurrentInvoice.bind(this));
     this.$el.on('click', '[data-action=download]', this.downloadCurrentInvoice.bind(this));
     this.$el.on('click', '[data-action=send]', this.sendCurrentInvoice.bind(this));
     this.$el.on('click', '.toggle-invoiceList', this.renderInvoiceList.bind(this));
-  },
-
-  bindToAccountBarEvents : function() {
-    var eventNames = ['signup', 'signin', 'resetpassword', 'changepassword', 'changeusername', 'signout', 'destroy']
-    
-    eventNames.forEach( this.proxyEvent(this.accountBar, 'account').bind(this) )
-  },
-
-  proxyEvent : function(module, namespace) {
-    return function(eventName, args) {
-      module.on(eventName, function() {
-        var args = Array.prototype.slice.call(arguments)
-        args.unshift( namespace +':'+ eventName )
-        this.$el.trigger.apply(this.$el, args);
-      }.bind(this))
-    }.bind(this);
-  },
+  },    
 
   addInvoice : function( properties ) {
     var $invoiceEl = this.$el.find('.invoiceSheet');
@@ -52,10 +33,23 @@ App = {
   },
 
   removeInvoice : function( id ) {
+    var invoice, currentInvoiceId;
+
+    // normalize input
     if (typeof id === 'object') {
       id = id.id;
     }
-    var currentInvoiceId = this.currentInvoice.id
+
+    // try to find invoice
+    var invoice = this.findInvoice(id)
+    if (!invoice ) {
+      return
+    }
+
+    // remove from store
+    store.remove( invoice )
+
+    currentInvoiceId = this.currentInvoice.id
     this.invoices.forEach( function( invoice, index) {
       if (invoice.id === id) {
         this.invoices.splice(index, 1);
@@ -71,12 +65,26 @@ App = {
     var invoice = this.addInvoice();
     this.showLastInvoice();
     invoice.save();
-    this.trigger('invoice:new', invoice);
+  },
+
+  addInvoiceFromRemote : function(invoice) {
+    this.addInvoice( invoice )
+    this.renderInvoiceList()
+  },
+
+  removeInvoiceFromRemote : function(invoice) {
+    this.removeInvoice( invoice )
+    this.renderInvoiceList()
+  },
+
+  updateInvoiceFromRemote : function(invoice) {
+    App.updateInvoice( invoice )
+    App.renderInvoiceList()
   },
 
   deleteCurrentInvoice : function() {
-    if (window.confirm("Really delete this invoice?")) {
-      this.currentInvoice['delete']();
+    if (window.confirm("Really delete this invoice?")) {      
+      this.removeInvoice( this.currentInvoice.toJSON() )
       this.showLastInvoice();
     }
   },
@@ -84,15 +92,26 @@ App = {
   downloadCurrentInvoice : function() {
     if (! this.currentInvoice)
       return;
-
-    this.trigger('invoice:download', this.currentInvoice)
+    
+    download( convert( $('.invoiceSheet') ).to( 'invoice.pdf ') )
   },
 
   sendCurrentInvoice : function() {
     if (! this.currentInvoice)
       return;
 
-    this.trigger('invoice:send', this.currentInvoice)
+
+    var recipient = prompt("Recipient: ");
+    if (! recipient)
+      return
+
+    sendEmail({
+      to          : recipient,
+      subject     : this.currentInvoice.title(),
+      html        : this.currentInvoice.toHTML(),
+      text        : this.currentInvoice.toText(),
+      attachments : [ convert( $('.invoiceSheet') ).to("invoice.pdf") ]
+    })
   },
 
   findInvoice : function(id) {
@@ -113,8 +132,6 @@ App = {
     if (invoice) {
       this.currentInvoice = invoice;
       this.currentInvoice.render();
-      this.currentInvoice.on('save', this.handleInvoiceSave.bind(this));
-      this.currentInvoice.on('delete', this.handleInvoiceDelete.bind(this));
     } else {
       alert("invoice could not be found (id="+id+")");
     }
@@ -166,6 +183,11 @@ App = {
     this.$el.show();
   },
 
+  addInvoicesAndRender : function(invoices) {
+    invoices.forEach( this.addInvoice );
+    this.render();
+  },
+
   renderUserSignedIn : function(username) {
     this.accountBar.renderSignedIn(username)
   },
@@ -190,22 +212,14 @@ App = {
     $modal.trigger('error', error)
   },
 
-  on : function(eventName, callback) {
-    this.$el.on.apply(this.$el, [eventName, function(event, properties) {
-      callback(properties);
-    }]);
-  },
+  handleShowInvoice : function(event) {
+    var $el, id;
+    event.preventDefault();
 
-  trigger : function() {
-    this.$el.trigger.apply(this.$el, arguments);
-  },
+    $el = $(event.currentTarget).closest('[data-id]');
+    id  = $el.data('id');
 
-  handleInvoiceSave : function(properties) {
-    this.trigger('invoice:save', properties);
-  },
-  handleInvoiceDelete : function(properties) {
-    this.removeInvoice( properties )
-    this.trigger('invoice:delete', properties);
+    this.showInvoice(id);
   }
 };
 
@@ -213,6 +227,10 @@ App = {
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 App.init = __bind(App.init, App)
 App.addInvoice = __bind(App.addInvoice, App)
+App.addInvoicesAndRender = __bind(App.addInvoicesAndRender, App)
+App.addInvoiceFromRemote = __bind(App.addInvoiceFromRemote, App)
+App.removeInvoiceFromRemote = __bind(App.removeInvoiceFromRemote, App)
+App.updateInvoiceFromRemote = __bind(App.updateInvoiceFromRemote, App)
 App.removeInvoice = __bind(App.removeInvoice, App)
 App.renderUserSignedIn = __bind(App.renderUserSignedIn, App)
 App.renderUserSignedOut = __bind(App.renderUserSignedOut, App)

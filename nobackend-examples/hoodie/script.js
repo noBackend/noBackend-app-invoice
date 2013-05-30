@@ -22,11 +22,6 @@ $('document').ready( function() {
   App.on('account:destroy', handleAccountDestroy);
 });
 
-// handle hoodie events
-hoodie.account.on('authenticated', App.renderUserSignedIn)
-hoodie.account.on('signout', App.renderUserSignedOut)
-hoodie.on('account:error:unauthenticated remote:error:unauthenticated', App.renderUserAuthenticationError)
-
 hoodie.remote.on('add:invoice', handleNewInvoiceFromRemote)
 hoodie.remote.on('remove:invoice', handleRemovedInvoiceFromRemote)
 hoodie.remote.on('change:invoice', handleChangedInvoiceFromRemote)
@@ -115,8 +110,7 @@ var handleAccountDestroy = function() {
 // when a new invoice gets synced from remote,
 // add it to the app and rerender the InvoiceList
 var handleNewInvoiceFromRemote = function( invoice ) {
-  App.addInvoice( invoice )
-  App.renderInvoiceList()
+  App.addInvoiceFromRemote( invoice )
 };
 
 // when an invoice got removed from remote, 

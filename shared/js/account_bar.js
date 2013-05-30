@@ -17,50 +17,60 @@ AccountBar.prototype.handleUserAction = function(event) {
 
   switch(action) {
     case 'signup':
-      $form = $.modalForm({
+      $.modalForm({
         fields: [ 'username', 'password', 'password_confirmation' ],
         submit: 'Sign Up'
-      });
+      }).on('submit', function(event, inputs) {
+        account.signUp( inputs.username, inputs.password )
+        .fail( App.renderModalFormError )
+      })
       break;
     case 'signin':
-      $form = $.modalForm({
+      $.modalForm({
         fields: [ 'username', 'password' ],
         submit: 'Sign in'
-      });
+      }).on('submit', function(event, inputs) {
+        account.signIn( inputs.username, inputs.password )
+        .fail( App.renderModalFormError )
+      })
+      break;
+    case 'signout':
+      account.signOut()
       break;
     case 'resetpassword':
-      $form = $.modalForm({
+      $.modalForm({
         fields: [ 'username' ],
         submit: 'Reset Password'
-      });
+      }).on('submit', function(event, inputs) {
+        account.signIn( inputs.username )
+        .fail( App.renderModalFormError )
+      })
       break;
     case 'changepassword':
-      $form = $.modalForm({
+      $.modalForm({
         fields: [ 'current_password', 'new_password' ],
         submit: 'Reset Password'
-      });
+      }).on('submit', function(event, inputs) {
+        account.changePassword( inputs.current_password, inputs.new_password )
+        .fail( App.renderModalFormError )
+      })
       break;
     case 'changeusername':
-      $form = $.modalForm({
+      $.modalForm({
         fields: [ 'current_password', 'new_username' ],
         submit: 'Reset Password'
-      });
+      }).on('submit', function(event, inputs) {
+        account.changeUsername( inputs.current_password, inputs.new_username )
+        .fail( App.renderModalFormError )
+      })
       break;
 
     case 'destroy':
       if( window.confirm("you sure?") ) {
-        this.trigger(action);
+        account.destroy()
       }
       return;
-      
-    default:
-      this.trigger(action);
-      return;
   }
-
-  $form.on('submit', function(event, inputs) {
-    this.trigger(action, inputs);
-  }.bind(this));
 };
 
 AccountBar.prototype.render = function() {
@@ -87,8 +97,4 @@ AccountBar.prototype.on = function(eventName, callback) {
   this.$el.on.apply(this.$el, [eventName, function(event, properties) {
     callback(properties);
   }]);
-};
-
-AccountBar.prototype.trigger = function() {
-  this.$el.trigger.apply(this.$el, arguments);
 };

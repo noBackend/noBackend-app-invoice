@@ -155,13 +155,7 @@ Invoice.prototype.save = function(event) {
     }
   }.bind(this))
 
-  this.trigger('save', this.toJSON())
-};
-
-Invoice.prototype['delete'] = function() {
-  this.trigger('delete', this.toJSON())
-  this.reset()
-  this.$el.html('')
+  store.save( this.toJSON() )
 };
 
 Invoice.prototype.addItem = function() {
@@ -229,11 +223,6 @@ Invoice.prototype.on = function(eventName, callback) {
     callback(properties);
   }]);
 },
-
-
-Invoice.prototype.trigger = function() {
-  this.$el.trigger.apply(this.$el, arguments)
-};
 
 Invoice.prototype.uuid = function(len) {
   var chars, i, radix;
