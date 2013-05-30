@@ -52,12 +52,6 @@ SockethubClient.connect({
 var invoices = {};
 $('document').ready( function() {
 
-  // handle App events
-  App.on('invoice:save',   handleInvoiceSave);
-  App.on('invoice:delete', handleInvoiceDelete);
-  App.on('invoice:send', handleInvoiceSend);
-
-
   remoteStorage.util.silenceAllLoggers();
   // request 'rw' access to the documents module
   remoteStorage.claimAccess({documents:'rw'}).then(function () {
@@ -71,10 +65,11 @@ $('document').ready( function() {
     // get all existing invoices in your remoteStorage account, and populate
     // the invoice list.
     invoices.getAll().then(function (list) {
+      var invoicesData = []
       for (var key in list) {
-        App.addInvoice(list[key].content);
+        invoicesData.push(list[key].content);
       }
-      App.render();
+      findAllDefer.resolve(invoicesData)
     });
 
     // Below are two event listeners, which are currently unused
@@ -90,12 +85,19 @@ $('document').ready( function() {
 
 });
 
+/**
+ * Dreamcode APIs
+ */
+var store = {}
+var remote = {}
+var sendEmail
+
 
 /**
- * Function: handleInvoiceSave
+ * Function: store.findAll
  *
- * When invoices are saved, the 'invoice:save' event is fired and this function
- * is called.
+ * When existing invoices are loaded initially,
+ * `store.findAll('invoice')` gets called.
  *
  * We call the setContent() function to save our invoice.
  *
@@ -107,8 +109,29 @@ $('document').ready( function() {
  *   invoice - the invoice document
  *
  */
-var handleInvoiceSave = function(invoice) {
-  console.log('handleInvoiceSave');
+var findAllDefer = $.Deferred()
+store.findAll = function (type) {
+  return findAllDefer.promise()
+}
+
+
+/**
+ * Function: store.save
+ *
+ * When invoices are saved, `store.save(invoice)` gets called.
+ *
+ * We call the setContent() function to save our invoice.
+ *
+ * If the invoice id (invoice.id) does not exist, a new document is
+ * automatically created. Otherwise the existing invoice is updated.
+ *
+ * Parameters:
+ *
+ *   invoice - the invoice document
+ *
+ */
+store.save = function(invoice) {
+  console.log('store.save', invoice);
 
   if (!invoices.setContent) { return false; }
   invoices.setContent(invoice.id, invoice).then(function () {
@@ -119,10 +142,9 @@ var handleInvoiceSave = function(invoice) {
 };
 
 /**
- * Function: handleInvoiceDelete
+ * Function: store.remove
  *
- * When invoices are deleted, the 'invoice:delete' event is fired and this
- * function is called.
+ * When invoices are deleted, `store.remove(invoice)` gets called.
  *
  * We call the remove() function with the invoice id (property.id) to remove the
  * invoice from remoteStorage.
@@ -132,8 +154,8 @@ var handleInvoiceSave = function(invoice) {
  *   invoice - the invoice document
  *
  */
-var handleInvoiceDelete = function(invoice) {
-  console.log('handleInvoiceDelete');
+store.remove = function(invoice) {
+  console.log('store.remove', invoice);
 
   if (!invoices.remove) { return false; }
   invoices.remove(invoice.id).then(function () {
@@ -144,10 +166,9 @@ var handleInvoiceDelete = function(invoice) {
 };
 
 /**
- * Function: handleInvoiceSend
+ * Function: sendEmail
  *
- * When invoices is to emailed, the 'invoice:send' event is fired and this
- * function is called.
+ * When invoices sent, `sendEmail(options)` gets called.
  *
  * First, we display a modal form to get the users SMTP credentials so that
  * Sockethub can authenticate and send the email via. the users SMTP server.
@@ -163,7 +184,7 @@ var handleInvoiceDelete = function(invoice) {
  *   invoice - the invoice document
  *
  */
-var handleInvoiceSend = function (invoice) {
+sendEmail = function (options) {
   console.log('handleInvoiceSend');
   if (!sc.isConnected()) { return false; }
 
@@ -190,20 +211,17 @@ var handleInvoiceSend = function (invoice) {
     // set email credentials
     sc.set('email', creds).then(function () {
       console.log('successfully set smtp credentials');
-      var recipient = prompt("Recipient: ");
-      if (! recipient)
-        return;
 
       // submit email message to sockethub for delivery
       sc.submit({
         platform: 'email',
         verb: 'send',
         actor: { address: from },
-        target: [{ address: recipient }],
+        target: [{ address: options.to }],
         object: {
-          subject: invoice.title(),
-          html: invoice.toHTML(),
-          text: invoice.toText()
+          subject: options.subject,
+          html: options.html,
+          text: options.text
         }
       }).then(function () {
         console.log('Email Sent!');
