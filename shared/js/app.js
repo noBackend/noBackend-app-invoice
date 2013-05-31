@@ -7,6 +7,9 @@ App = {
 
     // bootstrap
     store.findAll('invoice').then( this.addInvoicesAndRender )
+
+    // track with gaug.es
+    this.addTrackCode()
   },
 
   reset : function() {
@@ -220,6 +223,23 @@ App = {
     id  = $el.data('id');
 
     this.showInvoice(id);
+  },
+
+  addTrackCode : function() {
+    // Analytics
+    if( /nobackend.org/.test(location.host) ) {
+      var _gauges = _gauges || [];
+      (function() {
+        var t   = document.createElement('script');
+        t.type  = 'text/javascript';
+        t.async = true;
+        t.id    = 'gauges-tracker';
+        t.setAttribute('data-site-id', '519a2c84f5a1f516e9000011');
+        t.src = '//secure.gaug.es/track.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(t, s);
+      })();
+    }
   }
 };
 
