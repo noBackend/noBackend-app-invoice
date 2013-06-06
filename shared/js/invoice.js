@@ -114,6 +114,7 @@ Invoice.prototype.reset = function() {
 }
 Invoice.prototype.toJSON = function() {
   return $.extend(true, {}, {
+    type      : 'invoice',
     id        : this.id,
     items     : this.items,
     date      : this.date,

@@ -89,6 +89,8 @@ var account = {
 }
 
 // subscribe to account events
+account.on('signin', App.renderUserSignedIn)
+account.on('signout', App.renderUserSignedOut)
 account.on('unauthenticated', App.renderUserAuthenticationError)
 
 

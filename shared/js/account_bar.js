@@ -3,7 +3,13 @@ var AccountBar = function( $el, attributes ) {
   this.$body = $(document.body);
 
   this.bindToEvents();
-  this.renderSignedOut();
+
+  if ( account.username ) {
+    this.renderSignedIn( account.username );  
+  } else {
+    this.renderSignedOut();  
+  }
+  
 };
 
 AccountBar.prototype.bindToEvents = function() {
@@ -91,10 +97,4 @@ AccountBar.prototype.renderSignedIn = function(username) {
 AccountBar.prototype.renderAuthenticationError = function() {
   this.status = 'error';
   this.render();
-};
-
-AccountBar.prototype.on = function(eventName, callback) {
-  this.$el.on.apply(this.$el, [eventName, function(event, properties) {
-    callback(properties);
-  }]);
 };

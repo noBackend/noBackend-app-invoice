@@ -72,17 +72,14 @@ App = {
 
   addInvoiceFromRemote : function(invoice) {
     this.addInvoice( invoice )
-    this.renderInvoiceList()
   },
 
   removeInvoiceFromRemote : function(invoice) {
     this.removeInvoice( invoice )
-    this.renderInvoiceList()
   },
 
   updateInvoiceFromRemote : function(invoice) {
     App.updateInvoice( invoice )
-    App.renderInvoiceList()
   },
 
   deleteCurrentInvoice : function() {
@@ -164,6 +161,7 @@ App = {
   },
 
   renderInvoiceList : function() {
+    console.log('this.invoices', this.invoices)
     var html = ''
     this.invoices.forEach(function(invoice){
       var title;
