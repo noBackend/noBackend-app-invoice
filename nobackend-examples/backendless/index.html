@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+  	<meta charset="utf-8">
+
+  	<title>noBackend Invoice</title>
+
+    <link rel='stylesheet' href='../../shared/vendor/bootstrap/css/bootstrap.css' />
+  	<link rel='stylesheet' href='../../shared/css/app.css' />
+  	<link rel='stylesheet' href='../../shared/css/app-print.css' media="print" />
+  </head>
+
+  <body>
+    <!-- invoice to be rendered in here -->
+  	<div class="invoiceSheet"></div>
+
+    <div class="footerBar actionBar notPartOfInvoice">
+      <div class="buttons">
+        <span class="btn-group dropup">
+          <button class="newInvoice btn btn-small btn-primary" data-action="newInvoice"><i class="icon-plus icon-white"></i> invoice</button>
+          <button class="btn btn-small btn-primary dropdown-toggle toggle-invoiceList" data-toggle="dropdown">
+            <i class="icon-list icon-white"></i>
+          </button>
+          <ul class="invoiceList dropdown-menu pull-right"></ul>
+        </span>
+
+        <button class="download btn btn-inverse btn-small" data-action="deleteInvoice"><i class="icon-white icon-trash"></i> Delete</button>
+
+        <div class="accountbar">
+          <div class="account-signedout">
+            <span class="btn-group dropup">
+              <button class="btn btn-small btn-inverse" data-action="signup">Sign Up</button>
+              <button class="btn btn-small dropdown-toggle btn-inverse" data-toggle="dropdown">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right">
+                <li><a href="#" data-action="signin">Sign In</a></li>
+                <li><a href="#" data-action="resetpassword">Reset Password</a></li>
+                <li><a href="#" data-action="destroy">Clear local data</a></li>
+              </ul>
+            </span>
+          </div><!-- /.account-signedout -->
+
+          <div class="account-signedin">
+            Hello,
+            <span class="username"><!-- usern name will be filled in here --></span>
+            <span class="btn-group dropup">
+              <button class="btn btn-small btn-inverse" data-action="signout">Sign Out</button>
+              <button class="btn btn-small dropdown-toggle btn-inverse" data-toggle="dropdown">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right">
+                <li><a href="#" data-action="changepassword">Change Password</a></li>
+                <li><a href="#" data-action="changeusername">Change Username</a></li>
+                <li><a href="#" data-action="destroy">Destroy Account</a></li>
+              </ul>
+            </span>
+          </div><!-- /.account-signedin -->
+
+          <div class="account-error">
+            Hello,
+            <span class="username"><!-- usern name will be filled in here --></span>.
+            <span class="btn-group dropup">
+              <button class="btn btn-small btn-danger" data-action="signin">Authentication error: Sign in again</button>
+              <button class="btn btn-small dropdown-toggle btn-danger" data-toggle="dropdown">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu pull-right">
+                <li><a href="#" data-action="signout">Sign out</a></li>
+              </ul>
+            </span>
+          </div><!-- /.account-error -->
+        </div><!-- /.accountbar -->
+
+        <div class="about" title="about this app">
+          <a href="http://invoice.nobackend.org/#nobackend"><i class="icon-white icon-question-sign"></i></a>
+        </div>
+      </div>
+
+
+    <!-- Templates -->
+    <script id="invoice" type="text/html">
+      <textarea name="header" class="header">{{header}}</textarea>
+      <div class="identity">
+        <textarea name="address" placeholder="Your address">{{address}}</textarea>
+      </div>
+      <div class="customer">
+        <textarea name="customer" placeholder="Your client's address">{{customer}}</textarea>
+        <table class="meta">
+          <tr>
+            <td class="meta-head">Invoice #</td>
+            <td><textarea name="nr" placeholder="01">{{nr}}</textarea></td>
+          </tr>
+          <tr>
+            <td class="meta-head">Date</td>
+            <td><textarea name="date" id="date">{{date}}</textarea></td>
+          </tr>
+        </table>
+      </div>
+
+      <table class="items">
+
+        <thead>
+          <tr>
+              <th class="nameColumn">Item</th>
+              <th class="descriptionColumn">Description</th>
+              <th class="costColumn">Unit Cost</th>
+              <th class="quantityColumn">Quantity</th>
+              <th class="priceColumn">Price</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {{#items}}
+            {{>invoiceItem}}
+          {{/items}}
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td>
+              <button class="btn btn-primary" data-action="addItem">Add item</button>
+            </td>
+            <td colspan="3">Total</td>
+            <td class="priceColumn"><div class="total">{{total}}</div></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <div class="terms">
+        <h5>Terms</h5>
+        <textarea name="terms">{{terms}}</textarea>
+      </div><!-- /terms -->
+    </script>
+
+    <script id="invoiceItem" class="partial" type="text/html">
+      <tr class="item-row" data-item-id="{{id}}">
+        <td class="nameColumn">
+          <div class="delete-wpr">
+            <textarea name="item-name" placeholder="item">{{name}}</textarea>
+            <span class="notPartOfInvoice delete btn btn-small btn-danger" title="Remove row" data-action="removeItem">–</span>
+          </div>
+        </td>
+        <td class="descriptionColumn">
+          <textarea name="item-description" placeholder="description">{{description}}</textarea>
+        </td>
+        <td class="costColumn"><textarea name="item-cost" class="item-cost">{{cost}}</textarea></td>
+        <td class="quantityColumn"><textarea name="item-quantity" class="item-quantity">{{quantity}}</textarea></td>
+        <td class="priceColumn"><span class="item-total">{{total}}</span></td>
+      </tr>
+    </script>
+
+    <!-- shared vendor libs -->
+    <script src='../../shared/vendor/jquery-1.9.1.min.js'></script>
+    <script src='../../shared/vendor/bootstrap/js/bootstrap.min.js'></script>
+    <script src='../../shared/vendor/ICanHaz.min.js'></script>
+    <script src='../../shared/vendor/html2canvas.min.js'></script>
+    <script src='../../shared/vendor/bootstrap.modalform.js'></script>
+    <script src='../../shared/vendor/jquery.autosize-min.js'></script>
+    
+    <!-- shared app logic -->
+    <script src='../../shared/js/app.js'></script>
+    <script src='../../shared/js/invoice.js'></script>
+    <script src='../../shared/js/account_bar.js'></script>
+
+    <!-- nobackend libs -->
+    <script src='lib/backendless.js'></script>
+
+    <!-- custom logic -->
+    <script src='script.js'></script>
+  </body>
+</html>
