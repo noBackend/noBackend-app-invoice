@@ -61,7 +61,7 @@ var store = {
 
   // remove object from store
   remove : function(object) {
-    var defer = $.Deferred;
+    var defer = $.Deferred();
     var type = object.type;
     console.log('delete invoice');
     App.store[type].remove( object, new Backendless.Async( defer.resolve ));
@@ -69,12 +69,12 @@ var store = {
   }
 };
 
-
+var currentUser = Backendless.UserService.getCurrentUser();
 var account = {
-  username : '', // TODO: set current username here
+  username : currentUser && currentUser.login,
 
   signUp : function( username, password ) {
-    var defer = $.Deferred;
+    var defer = $.Deferred();
 
     var user = new Backendless.User();
     user.login = username;
@@ -88,36 +88,35 @@ var account = {
   },
 
   signIn : function( username, password ) {
-    var defer = $.Deferred;
+    var defer = $.Deferred();
 
-    console.log('account.signIn: ', username, password);
     App.renderUserSignedIn();
 
     Backendless.UserService.login( username, password,
       new Backendless.Async( function(data){
         App.user = new Backendless.User(data);
-        defer.resolve( App.user.username );
+        account.username = App.user.login;
+        defer.resolve( App.user.login );
       }, defer.reject )
     );
 
     return defer.promise();
   },
   signOut : function() {
-    var defer = $.Deferred;
-    console.log('account.signOut');
+    var defer = $.Deferred();
     Backendless.UserService.logout(new Backendless.Async(defer.resolve,defer.reject));
 
     return defer.promise();
   },
   resetPassword : function() {
-    var defer = $.Deferred;
+    var defer = $.Deferred();
     var async = new Backendless.Async( defer.resolve, defer.reject );
     Backendless.UserService.restorePassword( 'login', async);
 
     return defer.promise();
   },
   changePassword : function( current_password, new_password ) {
-    var defer = $.Deferred;
+    var defer = $.Deferred();
 
     App.user.password = new_password;
     Backendless.UserService.update(App.user, new Backendless.Async( defer.resolve, defer.reject ));
@@ -125,9 +124,10 @@ var account = {
     return defer.promise();
   },
   changeUsername : function( current_password, new_username ) {
-    var defer = $.Deferred;
+    var defer = $.Deferred();
 
-    App.user.username = new_username;
+    App.user.login = new_username;
+    account.username = App.user.login;
     Backendless.UserService.update(App.user, new Backendless.Async( defer.resolve, defer.reject ));
 
     return defer.promise();
