@@ -1,4 +1,4 @@
-Backendless.initApp("PUT-YOUR-APP-ID-HERE", "PUT-YOUR-JS-SECRET-KEY-HERE", "v1");
+Backendless.initApp("74A8D083-DC8E-45C0-FF42-34F2CC7CF300", "F6A11877-FADA-7577-FF2B-86A7CAF09400", "v1");
 
 var _promise = function () {
   var defer = $.Deferred()
@@ -6,9 +6,9 @@ var _promise = function () {
   return defer.promise()
 }
 
-// 
+//
 // data store implementations
-// 
+//
 var store = {
 
   // find all objects of one type
@@ -146,9 +146,9 @@ account.on('unauthenticated', App.renderUserAuthenticationError)
 
 // TODO: make these work
 
-// 
+//
 // remote / sync dreamcode
-// 
+//
 var remote = {
   on : function (event, callback) {
     console.log("remote.on(\""+event+"\")", callback)
