@@ -999,58 +999,6 @@
 
             return isAsync ? result : this._parseResponse(result);
         },
-        _findHelpers: {
-            'searchRectangle': function (arg) {
-                var rect = [
-                    'nwlat=' + arg[0], 'nwlon=' + arg[1], 'selat=' + arg[2], 'selon=' + arg[3]
-                ];
-                return rect.join('&');
-            },
-            'latitude': function (arg) {
-                return 'lat=' + arg;
-            },
-            'longitude': function (arg) {
-                return 'lon=' + arg;
-            },
-            'metadata': function (arg) {
-                return 'metadata=' + JSON.stringify(arg);
-            },
-            'radius': function (arg) {
-                return 'r=' + arg;
-            },
-            'categories': function (arg) {
-                arg = Utils.isString(arg) ? [arg] : arg;
-                return 'categories=' + encodeArrayToUriComponent(arg);
-            },
-            'includeMetadata': function () {
-                return 'includemetadata=true';
-            },
-            'pageSize': function (arg) {
-                if (arg < 1 || arg > 100) {
-                    throw new Error('PageSize can not be less then 1 or greater than 100');
-                } else {
-                    return 'pagesize=' + arg;
-                }
-            },
-            'offset': function (arg) {
-                if (arg < 0) {
-                    throw new Error('Offset can not be less then 0');
-                } else {
-                    return 'offset=' + arg;
-                }
-            },
-            'relativeFindPercentThreshold': function (arg) {
-                if (arg <= 0) {
-                    throw new Error('Threshold can not be less then or equal 0');
-                } else {
-                    return 'relativeFindPercentThreshold=' + arg;
-                }
-            },
-            'relativeFindMetadata': function (arg) {
-                return 'relativeFindMetadata=' + JSON.stringify(arg);
-            }
-        },
-
         addPoint: function (geopoint, async) {
             if (geopoint.latitude === undefined || geopoint.longitude === undefined) {
                 throw 'Latitude or longitude not a number';
@@ -1078,33 +1026,64 @@
             });
             return result;
         },
-
-        findUtil: function (query, async) {
-            var url = query["url"],
-                responder = extractResponder(arguments),
-                isAsync = false,
-                searchByCat = true;
+        find: function (query, async) {
+            var url = this.restUrl;
+            var responder = extractResponder(arguments), isAsync = false, searchByCat = true;
             if (responder != null) {
                 isAsync = true;
                 responder = this._wrapAsync(responder);
             }
             if (query.searchRectangle && query.radius) {
-                throw new Error("Inconsistent geo query. Query should not contain both rectangle and radius search parameters.");
+                throw "Inconsistent geo query. Query should not contain both rectangle and radius search parameters.";
             }
-            else if (query.radius && (query.latitude === undefined || query.longitude === undefined)) {
-                throw new Error("Latitude and longitude should be provided to search in radius");
-            }
-            else if ((query.relativeFindMetadata || query.relativeFindPercentThreshold) && !(query.relativeFindMetadata && query.relativeFindPercentThreshold)) {
-                throw new Error("Inconsistent geo query. Query should contain both relativeFindPercentThreshold and relativeFindMetadata or none of them");
+            else if (query.searchRectangle) {
+                var arr = query.searchRectangle;
+                url += '/rect?';
+                var rect = [
+                    'nwlat=' + arr[0], 'nwlon=' + arr[1], 'selat=' + arr[2], 'selon=' + arr[3]
+                ];
+                url += rect.join('&');
             }
             else {
-                url += query.searchRectangle ? '/rect?' : '/points?';
-                url += 'units=' + (query.units ? query.units : Backendless.Geo.UNITS.KILOMETERS);
-                for (var prop in query) {
-                    if (query.hasOwnProperty(prop) && this._findHelpers.hasOwnProperty(prop) && query[prop]) {
-                        url += '&' + this._findHelpers[prop](query[prop]);
-                    }
+                if (query.radius && (query.latitude === undefined || query.longitude === undefined)) {
+                    throw "Latitude and longitude should be provided to search in radius";
                 }
+                url += '/points?';
+                if (query.latitude != undefined) {
+                    url += 'lat=' + query.latitude;
+                    url += '&lon=' + query.longitude;
+                    url += '&units=' + (query.units ? query.units : Backendless.Geo.UNITS.KILOMETERS);
+                }
+            }
+            if (query.metadata) {
+                url += '&metadata=' + JSON.stringify(query.metadata);
+            }
+
+            if (query.radius) {
+                url += '&r=' + query.radius;
+            }
+            /*if(query.categories && searchByCat){
+             url = this.retsUrl + '/categories/';
+             } else */
+
+            if (query.categories) {
+                query.categories = Utils.isString(query.categories) ? [query.categories] : query.categories;
+                url += '&categories=' + encodeArrayToUriComponent(query.categories);
+            }
+            if (query.includeMetadata) {
+                url += '&includemetadata=true';
+            }
+            if (query.pageSize) {
+                if (query.pageSize < 1 || query.pageSize > 100) {
+                    throw new Error('PageSize can not be less then 1 or greater than 100');
+                }
+                url += '&pagesize=' + query.pageSize;
+            }
+            if (query.offset) {
+                if (query.offset < 0) {
+                    throw new Error('Offset can not be less then 0');
+                }
+                url += '&offset=' + query.offset;
             }
             url = url.replace(/\?&/g, '?');
             var result = Backendless._ajax({
@@ -1113,23 +1092,9 @@
                 isAsync: isAsync,
                 asyncHandler: responder
             });
+
             return isAsync ? result : this._parseResponse(result);
         },
-
-        find: function (query, async) {
-            query["url"] = this.restUrl;
-            return this.findUtil(query, async);
-        },
-
-        relativeFind: function (query, async) {
-            if (!(query.relativeFindMetadata && query.relativeFindPercentThreshold)) {
-                throw new Error("Inconsistent geo query. Query should contain both relativeFindPercentThreshold and relativeFindMetadata");
-            } else {
-                query["url"] = this.restUrl + "/relative";
-                return this.findUtil(query, async);
-            }
-        },
-
         addCategory: function (name, async) {
             if (!name) {
                 throw new Error('Category name is requred.');
@@ -1689,8 +1654,6 @@ var BackendlessGeoQuery = function () {
     this.categories = [];
     this.includeMetadata = true;
     this.metadata = undefined;
-    this.relativeFindMetadata = undefined;
-    this.relativeFindPercentThreshold = undefined;
     this.pageSize = undefined;
     this.latitude = undefined;
     this.longitude = undefined;
