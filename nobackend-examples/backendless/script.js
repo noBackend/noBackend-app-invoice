@@ -24,6 +24,11 @@ var store = {
           related: ['items']
         }
       }).data;
+
+
+      for( var i = 0; i < result.length; i++ )
+        result[ i ][ "date" ] = result[i][ "invoiceDate" ];
+
       return _promise(result);
     } catch(e){
       return _promise([]);
@@ -33,27 +38,39 @@ var store = {
   // add a new or update an existing object
   save : function(properties) {
     var type = properties.type;
+
+     for(var j = 0; j < properties.items.length; j++)
+       properties.items[ j ][ "___class"]  = "item";
+
     try{
       var obj = App.store[type].find({
-        options:{
-          related: ['items']
-        },
+        options:{ related: ['items'] },
         condition: "id='" + properties.id +"'"
       }).data[0];
       console.log('obj : ', obj);
-      if(obj){
+
+      if(obj)
+      {
+        obj[ "date"] = obj[ "invoiceDate" ];
         properties.objectId = obj.__updated__objectId || obj.objectId;
-        for(var i = 0; i < obj.items.length; i++){
-          for(var j = 0; j < properties.items.length; j++){
-            if(properties.items[j].id == obj.items[i].id) {
+
+        for(var i = 0; i < obj.items.length; i++)
+        {
+          for(var j = 0; j < properties.items.length; j++)
+          {
+            properties.items[ j ][ "___class"]  = "item";
+
+            if(properties.items[j].id == obj.items[i].id)
               properties.items[j].objectId = obj.items[i].objectId;
-            }
           }
         }
       }
       return _promise(properties);
     } catch(e){
     } finally {
+      properties[ "___class" ] = "invoice";
+      properties[ "invoiceDate" ] = properties[ "date" ];
+      delete properties[ "date" ];
       App.store.invoice.save(properties);
       return _promise(properties);
     }
