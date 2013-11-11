@@ -3,6 +3,7 @@ var Invoice = function( $el, attributes ) {
   if (! attributes) {
     attributes = this.defaultAttributes();
   }
+  attributes.___class = "invoice";
   $.extend(this, attributes);
 };
 
@@ -15,7 +16,8 @@ Invoice.prototype.defaultAttributes = function() {
     header   : "INVOICE",
     terms    : 'NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.',
     address  : "",
-    customer : ""
+    customer : "",
+	___class : "invoice"
   }
 }
 
@@ -26,7 +28,8 @@ Invoice.prototype.defaultItemAttributes = function() {
     name        : "",
     description : "",
     cost        : 100.00,
-    quantity    : 1
+    quantity    : 1,
+	___class    : "item"   
   }
 }
 
@@ -53,7 +56,10 @@ Invoice.prototype.bindToEvents = function() {
 };
 Invoice.prototype.render = function() {
   this.updatePrices();
-  this.$el.html( ich.invoice( this ) );
+  var invoice = ich.invoice( this );
+  console.log("this", this)
+  console.log("invoice", invoice)
+  this.$el.html( invoice );
   this.bindToEvents()
   this.$el.find('textarea').autosize();
   this.$items = this.$el.find('table.items tbody')
@@ -117,12 +123,13 @@ Invoice.prototype.toJSON = function() {
     type      : 'invoice',
     id        : this.id,
     items     : this.items,
-    date      : this.date,
+    idate      : this.date,
     header    : this.header,
     terms     : this.terms,
     address   : this.address,
     customer  : this.customer,
-    nr        : this.nr
+    nr        : this.nr,
+	___class  : "invoice"
   });
 }
 Invoice.prototype.save = function(event) {
@@ -147,6 +154,7 @@ Invoice.prototype.save = function(event) {
         if(property === 'name'){
           item = {}
         }
+		item.___class = "item";
         item[property] = $(el).val()
         if(property === 'quantity'){
           item.id = $(el).closest('[data-item-id]').data('item-id')
@@ -159,8 +167,9 @@ Invoice.prototype.save = function(event) {
   store.save( this.toJSON() )
 };
 
-Invoice.prototype.addItem = function() {
-  var item = this.defaultItemAttributes();
+Invoice.prototype.addItem = function(args) {
+  console.log("add item : ", arguments)
+  var item = args || this.defaultItemAttributes();
   var html = ich.invoiceItem( item )
   this.$items.append( html );  
   var $el = this.$items.find('[data-item-id="'+item.id+'"]')
