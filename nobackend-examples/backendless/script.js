@@ -1,6 +1,6 @@
 /* global Backendless, App */
 /* exported store */
-Backendless.initApp('74A8D083-DC8E-45C0-FF42-34F2CC7CF300', 'F6A11877-FADA-7577-FF2B-86A7CAF09400', 'v1');
+Backendless.initApp('686DE39A-2283-06BB-FF39-7DD2C26E1400', '9CE4DBF8-1562-23F1-FF51-A954975CEE00', 'v1');
 
 var _promise = function () {
   var defer = $.Deferred();
@@ -38,14 +38,14 @@ var store = {
         options:{
           related: ['items']
         },
-        condition: 'id="' + properties.id +'"'
+        condition: "id='" + properties.id +"'"
       }).data[0];
       console.log('obj : ', obj);
       if(obj){
         properties.objectId = obj.__updated__objectId || obj.objectId;
         for(var i = 0; i < obj.items.length; i++){
           for(var j = 0; j < properties.items.length; j++){
-            if(properties.items[j].id === obj.items[i].id) {
+            if(properties.items[j].id == obj.items[i].id) {
               properties.items[j].objectId = obj.items[i].objectId;
             }
           }
@@ -78,7 +78,7 @@ var account = {
 
     var user = new Backendless.User();
     user.login = username;
-    user.email = username;
+    //user.email = username;
     user.password = password;
     Backendless.UserService.register( user,
       new Backendless.Async( defer.resolve, defer.reject)
