@@ -60,6 +60,7 @@
         }
         return browser;
     })();
+    var UIState = null;
     var getNow = function () {
         return new Date().getTime();
     };
@@ -86,6 +87,16 @@
             elem.attachEvent("on" + evnt, func);
         else
             elem[evnt] = func;
+    };
+    Utils.isEmpty = function (obj) {
+        if (obj == null) return true;
+        if (Utils.isArray(obj) || Utils.isString(obj)) return obj.length === 0;
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key) && obj[key] !== undefined && obj[key] !== null) {
+                return false
+            }
+        }
+        return true;
     };
 
     Utils.removeEvent = function (evnt, elem) {
@@ -134,73 +145,169 @@
         }
     }
 
+    Backendless.setUIState = function (stateName) {
+        if (stateName === undefined) {
+            throw new Error('UI state name must be defined or explicitly set to null');
+        } else {
+            UIState = stateName === null ? null : stateName;
+        }
+    };
+
     Backendless._ajax_for_browser = function (config) {
-        config.method = config.method || 'GET';
-        config.isAsync = (typeof config.isAsync == 'boolean') ? config.isAsync : false;
-        /*if(typeof (XDomainRequest) !== 'undefined') {
-         return Backendless._ajaxIE8(config);
-         }  */
-
-        var badResponse = function (xhr) {
-            var response = {};
-            try {
-                response = JSON.parse(xhr.responseText);
-            }
-            catch (e) {
-                response.message = xhr.responseText;
-            }
-            response.statusCode = xhr.status;
-            return response;
-        };
-
-        var xhr = new XMLHttpRequest();
-        if (config.isAsync) {
-            xhr.onreadystatechange = function () {
-                var response;
-                if (xhr.readyState == 4) {
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        if (xhr.responseText)
-                            try {
-                                response = JSON.parse(xhr.responseText);
-                            } catch (e) {
-                                response = xhr.responseText;
-                            }
-                        else
-                            response = true;
-
-                        config.asyncHandler.success(response);
+        var cashingAllowedArr = ['cacheOnly', 'remoteDataOnly', 'fromCacheOrRemote', 'fromRemoteOrCache', 'fromCacheAndRemote'],
+            cacheMethods = {
+                ignoreCache: function (config) {
+                    return sendRequest(config);
+                },
+                cacheOnly: function (config) {
+                    var cachedResult = Backendless.Cache.get(config.url.replace(/([^A-Za-z0-9])/g, '')),
+                        cacheError = {
+                            message: 'error: cannot find data in Backendless.Cache',
+                            statusCode: 404
+                        };
+                    if (cachedResult) {
+                        config.isAsync && config.asyncHandler.success(cachedResult);
+                        return cachedResult;
+                    } else {
+                        if (config.isAsync) {
+                            config.asyncHandler.fault(cacheError);
+                        } else {
+                            throw cacheError;
+                        }
                     }
-                    else {
-                        config.asyncHandler.fault && config.asyncHandler.fault(badResponse(xhr));
+                },
+                remoteDataOnly: function (config) {
+                    return sendRequest(config);
+                },
+                fromCacheOrRemote: function (config) {
+                    var cachedResult = Backendless.Cache.get(config.url.replace(/([^A-Za-z0-9])/g, ''));
+                    if (cachedResult) {
+                        config.isAsync && config.asyncHandler.success(cachedResult);
+                        return cachedResult;
+                    } else {
+                        return sendRequest(config);
+                    }
+                },
+                fromRemoteOrCache: function (config) {
+                    return sendRequest(config);
+                },
+                fromCacheAndRemote: function (config) {
+                    var result = {},
+                        cachedResult = Backendless.Cache.get(config.url.replace(/([^A-Za-z0-9])/g, '')),
+                        cacheError = {
+                            message: 'error: cannot find data in Backendless.Cache',
+                            statusCode: 404
+                        };
+                    result.remote = sendRequest(config);
+                    if (cachedResult) {
+                        config.isAsync && config.asyncHandler.success(cachedResult);
+                        result.local = cachedResult;
+                    } else {
+                        if (config.isAsync) {
+                            config.asyncHandler.fault(cacheError);
+                        } else {
+                            throw cacheError;
+                        }
+                    }
+                    return result;
+                }
+            },
+            sendRequest = function (config) {
+                var xhr = new XMLHttpRequest(),
+                    contentType = config.data ? 'application/json' : 'application/x-www-form-urlencoded',
+                    response,
+                    parseResponse = function (xhr) {
+                        var result = true;
+                        if (xhr.responseText) {
+                            try {
+                                result = JSON.parse(xhr.responseText);
+                            } catch (e) {
+                                result = xhr.responseText;
+                            }
+                        }
+                        return result;
+                    },
+                    badResponse = function (xhr) {
+                        var result = {};
+                        try {
+                            result = JSON.parse(xhr.responseText);
+                        } catch (e) {
+                            result.message = xhr.responseText;
+                        }
+                        result.statusCode = xhr.status;
+                        result.message = result.message || 'unknown error occurred';
+                        return result;
+                    },
+                    cacheHandler = function (response) {
+                        response = cloneObject(response);
+                        if (config.method == 'GET' && config.cacheActive) {
+                            response.cachePolicy = config.cachePolicy;
+                            Backendless.Cache.set(config.urlBlueprint, response);
+                        } else if (Backendless.Cache.exists(config.urlBlueprint)) {
+                            if (response === true || config.method == 'DELETE') {
+                                response = undefined;
+                            } else {
+                                response.cachePolicy = Backendless.Cache.getCachePolicy(config.urlBlueprint);
+                            }
+                            '___class' in response && delete response['___class'];  // this issue must be fixed on server side
+                            Backendless.Cache.set(config.urlBlueprint, response);
+                        }
+                    },
+                    checkInCache = function () {
+                        return config.cacheActive && config.cachePolicy.policy == 'fromRemoteOrCache' && Backendless.Cache.exists(config.urlBlueprint);
+                    };
+
+                xhr.open(config.method, config.url, config.isAsync);
+                xhr.setRequestHeader('Content-Type', contentType);
+                xhr.setRequestHeader('application-id', Backendless.applicationId);
+                xhr.setRequestHeader('secret-key', Backendless.secretKey);
+                xhr.setRequestHeader('application-type', 'JS');
+                if (currentUser != null && currentUser["user-token"]) {
+                    xhr.setRequestHeader("user-token", currentUser["user-token"]);
+                }
+                if (UIState !== null) {
+                    xhr.setRequestHeader("uiState", UIState);
+                }
+                if (config.isAsync) {
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 4) {
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                response = parseResponse(xhr);
+                                cacheHandler(response);
+                                config.asyncHandler.success && config.asyncHandler.success(response);
+                            } else if (checkInCache()) {
+                                config.asyncHandler.success && config.asyncHandler.success(Backendless.Cache.get(config.urlBlueprint));
+                            } else {
+                                config.asyncHandler.fault && config.asyncHandler.fault(badResponse(xhr));
+                            }
+                        }
                     }
                 }
+                xhr.send(config.data);
+                if (config.isAsync) {
+                    return xhr;
+                } else if (xhr.status >= 200 && xhr.status < 300) {
+                    response = parseResponse(xhr);
+                    cacheHandler(response);
+                    return response;
+                } else if (checkInCache()) {
+                    return Backendless.Cache.get(config.urlBlueprint);
+                } else {
+                    throw badResponse(xhr);
+                }
             };
-        }
 
-        var data = config.data;
-        //todo:
-        //data = JSON.stringify(data);
-        xhr.open(config.method, config.url, config.isAsync);
-        var contentType = data ? 'application/json' : 'application/x-www-form-urlencoded';
+        config.method = config.method || 'GET';
+        config.cachePolicy = config.cachePolicy || {policy: 'ignoreCache'};
+        config.isAsync = (typeof config.isAsync == 'boolean') ? config.isAsync : false;
+        config.cacheActive = (config.method == 'GET') && (cashingAllowedArr.indexOf(config.cachePolicy.policy) != -1);
+        config.urlBlueprint = config.url.replace(/([^A-Za-z0-9])/g, '');
 
-        xhr.setRequestHeader('Content-Type', contentType);
-        xhr.setRequestHeader('application-id', Backendless.applicationId);
-        xhr.setRequestHeader("secret-key", Backendless.secretKey);
-        xhr.setRequestHeader("application-type", "JS");
-
-        if (currentUser != null) {
-            xhr.setRequestHeader("user-token", currentUser["user-token"]);
-        }
-        xhr.send(data);
-
-        if (config.isAsync) {
-            return xhr;
-        }
-        if (xhr.status >= 200 && xhr.status < 300) {
-            return xhr.responseText ? JSON.parse(xhr.responseText) : true;
-        }
-        else {
-            throw badResponse(xhr);
+        try {
+            return cacheMethods[config.cachePolicy.policy].call(this, config);
+        } catch (error) {
+            console.log('error: ' + error.message);
+            throw error;
         }
     };
 
@@ -277,12 +384,16 @@
 
     var deepExtend = function (destination, source) {
         for (var property in source) {
-            if (source[property] != undefined) {
+            if (source[property] !== undefined) {
                 destination[property] = destination[property] || {};
                 destination[property] = source[property];
             }
         }
         return destination;
+    };
+
+    var cloneObject = function (obj) {
+        return toString.call(obj) == '[object Array]' ? obj.slice() : deepExtend({}, obj);
     };
 
     var extractResponder = function (args) {
@@ -296,6 +407,9 @@
     };
 
     function extendCollection(collection, dataMapper) {
+        if (collection.nextPage && collection.nextPage.split("/")[1] == Backendless.appVersion) {
+            collection.nextPage = Backendless.serverURL + collection.nextPage
+        }
         collection._nextPage = collection.nextPage;
         collection.nextPage = function (async) {
             return dataMapper._load(this._nextPage, async);
@@ -306,7 +420,7 @@
                 async = pageSize;
             }
             else {
-                nextPage = nextPage.replace(/pagesize=\d+/ig, 'pagesize=' + pageSize);
+                nextPage = nextPage.replace(/pagesize=\d+/ig, 'pageSize=' + pageSize);
             }
             async = extractResponder(arguments);
             return dataMapper._load(nextPage, async);
@@ -329,12 +443,143 @@
         }
     }
 
+    function setCache() {
+        var store = {},
+            localStorageName = 'localStorage',
+            storage;
+        store.enabled = false;
+        store.set = function (key, value) {
+        };
+        store.get = function (key) {
+        };
+        store.remove = function (key) {
+        };
+        store.clear = function () {
+        };
+        store.getAll = function () {
+        };
+        store.serialize = function (value) {
+            return JSON.stringify(value);
+        };
+        store.deserialize = function (value) {
+            if (typeof value != 'string') {
+                return undefined;
+            }
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return value || undefined;
+            }
+        };
+        function isLocalStorageSupported() {
+            try {
+                return isBrowser() && (localStorageName in window && window[localStorageName]);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        if (isLocalStorageSupported()) {
+            storage = window[localStorageName];
+            var createBndlsStorage = function () {
+                    if (!('Backendless' in storage)) {
+                        storage.setItem('Backendless', store.serialize({}));
+                    }
+                },
+                expired = function (obj) {
+                    var result = false;
+                    if (Object.prototype.toString.call(obj).slice(8, -1) == "Object") {
+                        if ('cachePolicy' in obj && 'timeToLive' in obj['cachePolicy'] && obj['cachePolicy']['timeToLive'] != -1 && 'created' in obj['cachePolicy']) {
+                            result = (new Date().getTime() - obj['cachePolicy']['created']) > obj['cachePolicy']['timeToLive'];
+                        }
+                    }
+                    return result;
+                },
+                addTimestamp = function (obj) {
+                    if (Object.prototype.toString.call(obj).slice(8, -1) == "Object") {
+                        if ('cachePolicy' in obj && 'timeToLive' in obj['cachePolicy']) {
+                            obj['cachePolicy']['created'] = new Date().getTime();
+                        }
+                    }
+                };
+            createBndlsStorage();
+            store.enabled = true;
+            store.exists = function (key) {
+                return store.get(key) !== undefined;
+            };
+            store.set = function (key, val) {
+                if (val === undefined) {
+                    return store.remove(key);
+                }
+                createBndlsStorage();
+                var backendlessObj = store.deserialize(storage.getItem('Backendless'));
+                addTimestamp(val);
+                backendlessObj[key] = val;
+                storage.setItem('Backendless', store.serialize(backendlessObj));
+                return val;
+            };
+            store.get = function (key) {
+                createBndlsStorage();
+                var backendlessObj = store.deserialize(storage.getItem('Backendless')),
+                    obj = backendlessObj[key],
+                    result = obj;
+                if (expired(obj)) {
+                    delete backendlessObj[key];
+                    storage.setItem('Backendless', store.serialize(backendlessObj));
+                    result = undefined;
+                }
+                if (result && result['cachePolicy']) {
+                    delete result['cachePolicy']
+                }
+                return result;
+            };
+            store.remove = function (key) {
+                var result;
+                createBndlsStorage();
+                key = key.replace(/([^A-Za-z0-9])/g, '');
+                var backendlessObj = store.deserialize(storage.getItem('Backendless'));
+                if (backendlessObj.hasOwnProperty(key)) {
+                    result = delete backendlessObj[key];
+                }
+                storage.setItem('Backendless', store.serialize(backendlessObj));
+                return result;
+            };
+            store.clear = function () {
+                storage.setItem('Backendless', store.serialize({}));
+            };
+            store.getAll = function () {
+                createBndlsStorage();
+                var backendlessObj = store.deserialize(storage.getItem('Backendless')),
+                    ret = {};
+                for (var prop in backendlessObj) {
+                    if (backendlessObj.hasOwnProperty(prop)) {
+                        ret[prop] = backendlessObj[prop];
+                        if (ret[prop] !== null && ret[prop].hasOwnProperty('cachePolicy')) {
+                            delete ret[prop]['cachePolicy'];
+                        }
+                    }
+                }
+                return ret;
+            };
+            store.getCachePolicy = function (key) {
+                createBndlsStorage();
+                var backendlessObj = store.deserialize(storage.getItem('Backendless')),
+                    obj = backendlessObj[key];
+                return obj ? obj['cachePolicy'] : undefined;
+            };
+        }
+        return store;
+    }
+
+    Backendless.Cache = setCache();
+
     Backendless.Async = Async;
 
     function DataQuery() {
         this.properties = [];
         this.condition = null;
         this.options = null;
+        this.url = null;
     }
 
     DataQuery.prototype = {
@@ -343,6 +588,7 @@
             this.properties.push(prop);
         }
     };
+
     Backendless.DataQuery = DataQuery;
 
     function DataStore(model) {
@@ -395,42 +641,26 @@
             };
             return new Async(success, error);
         },
-        _parseResponse: function (respose) {
-            var i, len, _Model = this.model, me = this;
-            if (respose.data) {
-                var collection = respose, arr = collection.data;
-
+        _parseResponse: function (response) {
+            var i, len, _Model = this.model, item;
+            if (response.data) {
+                var collection = response, arr = collection.data;
                 for (i = 0, len = arr.length; i < len; ++i) {
                     arr[i] = arr[i].fields || arr[i];
-                    var item = new _Model;
+                    item = new _Model;
                     deepExtend(item, arr[i]);
+                    arr[i] = item;
                 }
                 extendCollection(collection, this);
                 return collection;
             }
             else {
-                respose = respose.fields || respose;
-                var item = new _Model;
-                deepExtend(item, respose);
-                return item;
+                response = response.fields || response;
+                item = new _Model;
+                deepExtend(item, response);
+                return this._formCircDeps(item);
             }
 
-        },
-        _getSingle: function (args, path) {
-            var responder = extractResponder(args), isAsync = false;
-            if (responder != null) {
-                isAsync = true;
-                responder = this._wrapAsync(responder);
-            }
-
-            var result = Backendless._ajax({
-                method: 'GET',
-                url: this.restUrl + path,
-                isAsync: isAsync,
-                asyncHandler: responder
-            });
-
-            return isAsync ? result : this._parseResponse(result);
         },
         _load: function (url, async) {
             var responder = extractResponder(arguments), isAsync = false;
@@ -448,7 +678,57 @@
 
             return isAsync ? result : this._parseResponse(result);
         },
+        _replCircDeps: function (obj) {
+            var objMap = [obj],
+                pos,
+                GenID = function () {
+                    for (var b = '', a = b; a++ < 36; b += a * 51 && 52 ? (a ^ 15 ? 8 ^ Math.random() * (a ^ 20 ? 16 : 4) : 4).toString(16) : '-') {
+                    }
+                    return b;
+                },
+                _replCircDepsHelper = function (obj) {
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop) && typeof obj[prop] == "object" && obj[prop] != null) {
+                            if ((pos = objMap.indexOf(obj[prop])) != -1) {
+                                objMap[pos]["__subID"] = objMap[pos]["__subID"] || GenID();
+                                obj[prop] = {"__originSubID": objMap[pos]["__subID"]};
+                            } else {
+                                objMap.push(obj[prop]);
+                                _replCircDepsHelper(obj[prop]);
+                            }
+                        }
+                    }
+                };
+            _replCircDepsHelper(obj);
+        },
+        _formCircDeps: function (obj) {
+            var circDepsIDs = {},
+                result = new obj.constructor(),
+                _formCircDepsHelper = function (obj, result) {
+                    if (obj.hasOwnProperty("__subID")) {
+                        circDepsIDs[obj["__subID"]] = result;
+                        delete obj["__subID"];
+                    }
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop)) {
+                            if (typeof obj[prop] == "object" && obj[prop] != null) {
+                                if (obj[prop].hasOwnProperty("__originSubID")) {
+                                    result[prop] = circDepsIDs[obj[prop]["__originSubID"]];
+                                } else {
+                                    result[prop] = {};
+                                    _formCircDepsHelper(obj[prop], result[prop]);
+                                }
+                            } else {
+                                result[prop] = obj[prop];
+                            }
+                        }
+                    }
+                };
+            _formCircDepsHelper(obj, result);
+            return result;
+        },
         save: function (obj, async) {
+            this._replCircDeps(obj);
             var responder = extractResponder(arguments), isAsync = false;
             var method = 'POST', url = this.restUrl;
             if (obj.objectId) {
@@ -483,10 +763,17 @@
             });
             return isAsync ? result : this._parseResponse(result);
         },
-        find: function (dataQuery, async) {
+
+        find: function (dataQuery) {
             dataQuery = dataQuery || {};
-            /*propertyList, condition, queryOptions,*/
-            var props, whereClause, options, query = [];
+            var props,
+                whereClause,
+                options,
+                query = [],
+                url,
+                responder = extractResponder(arguments),
+                isAsync = responder != null,
+                result;
             if (dataQuery.properties) {
                 props = 'props=' + encodeArrayToUriComponent(dataQuery.properties);
             }
@@ -496,40 +783,70 @@
             if (dataQuery.options) {
                 options = this._extractQueryOptions(dataQuery.options);
             }
-
+            responder != null && (responder = this._wrapAsync(responder));
             options && query.push(options);
             whereClause && query.push(whereClause);
             props && query.push(props);
             query = query.join('&');
-
-            var responder = extractResponder(arguments), isAsync = false;
-            if (responder != null) {
-                isAsync = true;
-                responder = this._wrapAsync(responder);
+            if (dataQuery.url) {
+                url = this.restUrl + '/' + dataQuery.url;
+            } else {
+                url = this.restUrl + (query ? '?' + query : '');
             }
-
-            var result = Backendless._ajax({
+            result = Backendless._ajax({
                 method: 'GET',
-                url: this.restUrl + '?' + query,
+                url: url,
                 isAsync: isAsync,
-                asyncHandler: responder
+                asyncHandler: responder,
+                cachePolicy: dataQuery.cachePolicy
             });
             return isAsync ? result : this._parseResponse(result);
         },
 
+        _extractCachePolicy: function () {
+            for (var i = 0; i < arguments.length; i++) {
+                if (arguments[i].hasOwnProperty('cachePolicy')) {
+                    return arguments[i]['cachePolicy'];
+                }
+            }
+            return undefined
+        },
+
         findById: function (objId, relations) {
-            var rel = Object.prototype.toString.call(relations) === "[object Array]" ? relations.join(',') : '*';
-            return this._getSingle(arguments, '/' + objId + '?loadRelations=' + rel);
+            var args = [
+                {
+                    url: objId + (Object.prototype.toString.call(relations) === "[object Array]" ? '?loadRelations=' + relations.join(',') : ''),
+                    cachePolicy: this._extractCachePolicy.apply(this, arguments)
+                }
+            ];
+            return this.find.apply(this, args.concat(Array.prototype.slice.call(arguments)));
         },
-        loadRelations: function (objId, relations) {
-            var rel = Object.prototype.toString.call(relations) === "[object Array]" ? relations.join(',') : '*';
-            return this._getSingle(arguments, '/' + objId + '/relations?loadRelations=' + rel);
+        loadRelations: function (obj, relations) {
+            var args = [
+                {
+                    url: obj.objectId + '/relations?loadRelations=' + (Object.prototype.toString.call(relations) === "[object Array]" ? relations.join(',') : '*'),
+                    cachePolicy: this._extractCachePolicy.apply(this, arguments)
+                }
+            ];
+            deepExtend(obj, this.find.apply(this, args.concat(Array.prototype.slice.call(arguments))));
         },
-        findFirst: function (async) {
-            return this._getSingle(arguments, '/first');
+        findFirst: function () {
+            var args = [
+                {
+                    url: 'first',
+                    cachePolicy: this._extractCachePolicy.apply(this, arguments)
+                }
+            ];
+            return this.find.apply(this, args.concat(Array.prototype.slice.call(arguments)));
         },
-        findLast: function (async) {
-            return this._getSingle(arguments, '/last');
+        findLast: function () {
+            var args = [
+                {
+                    url: 'last',
+                    cachePolicy: this._extractCachePolicy.apply(this, arguments)
+                }
+            ];
+            return this.find.apply(this, args.concat(Array.prototype.slice.call(arguments)));
         }
     };
     var dataStoreCache = {};
@@ -578,9 +895,9 @@
     function User() {
     }
 
-    User.prototype = {
-        password: null
-    };
+//    User.prototype = {
+//        password: ""
+//    };
     Backendless.User = User;
 
     var currentUser = null;
@@ -624,6 +941,21 @@
                 isAsync: isAsync,
                 asyncHandler: responder,
                 data: JSON.stringify(user)
+            });
+            return isAsync ? result : this._parseResponse(result);
+        },
+
+        getUserRoles: function (async) {
+            var responder = extractResponder(arguments);
+            var isAsync = responder != null;
+            if (responder) {
+                responder = this._wrapAsync(responder);
+            }
+            var result = Backendless._ajax({
+                method: 'GET',
+                url: this.restUrl + '/userroles',
+                isAsync: isAsync,
+                asyncHandler: responder
             });
             return isAsync ? result : this._parseResponse(result);
         },
@@ -723,7 +1055,7 @@
             var result = Backendless._ajax({
                 method: 'GET',
                 url: this.restUrl + '/userclassprops',
-                isAsync: responder,
+                isAsync: isAsync,
                 asyncHandler: responder
             });
             if (isAsync) {
@@ -773,7 +1105,7 @@
             }
         },
         getCurrentUser: function () {
-            return currentUser;
+            return currentUser ? this._getUserFromResponse(currentUser) : null;
         },
         update: function (user, async) {
             if (!(user instanceof Backendless.User)) {
@@ -786,7 +1118,7 @@
             }
             var result = Backendless._ajax({
                 method: 'PUT',
-                url: this.restUrl + '/' + user.id,
+                url: this.restUrl + '/' + user.objectId,
                 isAsync: isAsync,
                 asyncHandler: responder,
                 data: JSON.stringify(user)
@@ -999,6 +1331,61 @@
 
             return isAsync ? result : this._parseResponse(result);
         },
+        _findHelpers: {
+            'searchRectangle': function (arg) {
+                var rect = [
+                    'nwlat=' + arg[0], 'nwlon=' + arg[1], 'selat=' + arg[2], 'selon=' + arg[3]
+                ];
+                return rect.join('&');
+            },
+            'latitude': function (arg) {
+                return 'lat=' + arg;
+            },
+            'longitude': function (arg) {
+                return 'lon=' + arg;
+            },
+            'metadata': function (arg) {
+                return 'metadata=' + JSON.stringify(arg);
+            },
+            'radius': function (arg) {
+                return 'r=' + arg;
+            },
+            'categories': function (arg) {
+                arg = Utils.isString(arg) ? [arg] : arg;
+                return 'categories=' + encodeArrayToUriComponent(arg);
+            },
+            'includeMetadata': function (arg) {
+                return 'includemetadata=' + arg;
+            },
+            'pageSize': function (arg) {
+                if (arg < 1 || arg > 100) {
+                    throw new Error('PageSize can not be less then 1 or greater than 100');
+                } else {
+                    return 'pageSize=' + arg;
+                }
+            },
+            'offset': function (arg) {
+                if (arg < 0) {
+                    throw new Error('Offset can not be less then 0');
+                } else {
+                    return 'offset=' + arg;
+                }
+            },
+            'relativeFindPercentThreshold': function (arg) {
+                if (arg <= 0) {
+                    throw new Error('Threshold can not be less then or equal 0');
+                } else {
+                    return 'relativeFindPercentThreshold=' + arg;
+                }
+            },
+            'relativeFindMetadata': function (arg) {
+                return 'relativeFindMetadata=' + JSON.stringify(arg);
+            },
+            'condition': function (arg) {
+                return 'whereClause=' + encodeURIComponent(arg);
+            }
+        },
+
         addPoint: function (geopoint, async) {
             if (geopoint.latitude === undefined || geopoint.longitude === undefined) {
                 throw 'Latitude or longitude not a number';
@@ -1026,64 +1413,33 @@
             });
             return result;
         },
-        find: function (query, async) {
-            var url = this.restUrl;
-            var responder = extractResponder(arguments), isAsync = false, searchByCat = true;
+
+        findUtil: function (query, async) {
+            var url = query["url"],
+                responder = extractResponder(arguments),
+                isAsync = false,
+                searchByCat = true;
             if (responder != null) {
                 isAsync = true;
                 responder = this._wrapAsync(responder);
             }
             if (query.searchRectangle && query.radius) {
-                throw "Inconsistent geo query. Query should not contain both rectangle and radius search parameters.";
+                throw new Error("Inconsistent geo query. Query should not contain both rectangle and radius search parameters.");
             }
-            else if (query.searchRectangle) {
-                var arr = query.searchRectangle;
-                url += '/rect?';
-                var rect = [
-                    'nwlat=' + arr[0], 'nwlon=' + arr[1], 'selat=' + arr[2], 'selon=' + arr[3]
-                ];
-                url += rect.join('&');
+            else if (query.radius && (query.latitude === undefined || query.longitude === undefined)) {
+                throw new Error("Latitude and longitude should be provided to search in radius");
+            }
+            else if ((query.relativeFindMetadata || query.relativeFindPercentThreshold) && !(query.relativeFindMetadata && query.relativeFindPercentThreshold)) {
+                throw new Error("Inconsistent geo query. Query should contain both relativeFindPercentThreshold and relativeFindMetadata or none of them");
             }
             else {
-                if (query.radius && (query.latitude === undefined || query.longitude === undefined)) {
-                    throw "Latitude and longitude should be provided to search in radius";
+                url += query.searchRectangle ? '/rect?' : '/points?';
+                url += 'units=' + (query.units ? query.units : Backendless.Geo.UNITS.KILOMETERS);
+                for (var prop in query) {
+                    if (query.hasOwnProperty(prop) && this._findHelpers.hasOwnProperty(prop) && query[prop] != undefined) {
+                        url += '&' + this._findHelpers[prop](query[prop]);
+                    }
                 }
-                url += '/points?';
-                if (query.latitude != undefined) {
-                    url += 'lat=' + query.latitude;
-                    url += '&lon=' + query.longitude;
-                    url += '&units=' + (query.units ? query.units : Backendless.Geo.UNITS.KILOMETERS);
-                }
-            }
-            if (query.metadata) {
-                url += '&metadata=' + JSON.stringify(query.metadata);
-            }
-
-            if (query.radius) {
-                url += '&r=' + query.radius;
-            }
-            /*if(query.categories && searchByCat){
-             url = this.retsUrl + '/categories/';
-             } else */
-
-            if (query.categories) {
-                query.categories = Utils.isString(query.categories) ? [query.categories] : query.categories;
-                url += '&categories=' + encodeArrayToUriComponent(query.categories);
-            }
-            if (query.includeMetadata) {
-                url += '&includemetadata=true';
-            }
-            if (query.pageSize) {
-                if (query.pageSize < 1 || query.pageSize > 100) {
-                    throw new Error('PageSize can not be less then 1 or greater than 100');
-                }
-                url += '&pagesize=' + query.pageSize;
-            }
-            if (query.offset) {
-                if (query.offset < 0) {
-                    throw new Error('Offset can not be less then 0');
-                }
-                url += '&offset=' + query.offset;
             }
             url = url.replace(/\?&/g, '?');
             var result = Backendless._ajax({
@@ -1092,9 +1448,23 @@
                 isAsync: isAsync,
                 asyncHandler: responder
             });
-
             return isAsync ? result : this._parseResponse(result);
         },
+
+        find: function (query, async) {
+            query["url"] = this.restUrl;
+            return this.findUtil(query, async);
+        },
+
+        relativeFind: function (query, async) {
+            if (!(query.relativeFindMetadata && query.relativeFindPercentThreshold)) {
+                throw new Error("Inconsistent geo query. Query should contain both relativeFindPercentThreshold and relativeFindMetadata");
+            } else {
+                query["url"] = this.restUrl + "/relative";
+                return this.findUtil(query, async);
+            }
+        },
+
         addCategory: function (name, async) {
             if (!name) {
                 throw new Error('Category name is requred.');
@@ -1409,6 +1779,43 @@
             });
             return result;
         },
+        sendEmail: function (subject, bodyParts, recipients, attachments, async) {
+            var responder = extractResponder(arguments);
+            var isAsync = responder != null;
+            var data = {};
+            if (subject && !Utils.isEmpty(subject) && Utils.isString(subject)) {
+                data.subject = subject;
+            } else {
+                throw "Subject is required parameter and must be a nonempty string";
+            }
+            if ((bodyParts instanceof Bodyparts) && !Utils.isEmpty(bodyParts)) {
+                data.bodyparts = bodyParts;
+            } else {
+                throw "Use Bodyparts as bodyParts argument, must contain at least one property";
+            }
+            if (recipients && Utils.isArray(recipients) && !Utils.isEmpty(recipients)) {
+                data.to = recipients;
+            } else {
+                throw "Recipients is required parameter, must be a nonempty array";
+            }
+            if (attachments) {
+                if (Utils.isArray(attachments)) {
+                    if (!Utils.isEmpty(attachments)) {
+                        data.attachment = attachments;
+                    }
+                } else {
+                    throw "Attachments must be an array of file IDs from File Service";
+                }
+            }
+
+            return Backendless._ajax({
+                method: 'POST',
+                url: this.restUrl + '/email',
+                isAsync: isAsync,
+                asyncHandler: responder,
+                data: JSON.stringify(data)
+            });
+        },
         cancel: function (messageId, async) {
             var isAsync = async != null;
             var result = Backendless._ajax({
@@ -1517,14 +1924,26 @@
     function send(e) {
         var xhr = new XMLHttpRequest(),
             boundary = '-backendless-multipart-form-boundary-' + getNow(),
-            builder = getBuilder(this.fileName, e.target.result, boundary);
+            builder = getBuilder(this.fileName, e.target.result, boundary),
+            badResponse = function (xhr) {
+                var result = {};
+                try {
+                    result = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    result.message = xhr.responseText;
+                }
+                result.statusCode = xhr.status;
+                return result;
+            };
 
         xhr.open("POST", this.uploadPath, true);
         xhr.setRequestHeader('content-type', 'multipart/form-data; boundary=' + boundary);
         xhr.setRequestHeader('application-id', Backendless.applicationId);
         xhr.setRequestHeader("secret-key", Backendless.secretKey);
         xhr.setRequestHeader("application-type", "JS");
-
+        if (UIState !== null) {
+            xhr.setRequestHeader("uiState", UIState);
+        }
         var asyncHandler = this.asyncHandler;
         if (asyncHandler)
             xhr.onreadystatechange = function () {
@@ -1654,6 +2073,9 @@ var BackendlessGeoQuery = function () {
     this.categories = [];
     this.includeMetadata = true;
     this.metadata = undefined;
+    this.condition = undefined;
+    this.relativeFindMetadata = undefined;
+    this.relativeFindPercentThreshold = undefined;
     this.pageSize = undefined;
     this.latitude = undefined;
     this.longitude = undefined;
@@ -1704,6 +2126,12 @@ var DeliveryOptions = function (args) {
     this.publishAt = args.publishAt || undefined;
     this.repeatEvery = args.repeatEvery || undefined;
     this.repeatExpiresAt = args.repeatExpiresAt || undefined;
+};
+
+var Bodyparts = function (args) {
+    args = args || {};
+    this.textmessage = args.textmessage || undefined;
+    this.htmlmessage = args.htmlmessage || undefined;
 };
 
 var SubscriptionOptions = function (args) {
