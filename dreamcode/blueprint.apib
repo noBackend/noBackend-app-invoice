@@ -1,0 +1,312 @@
+# Invoice app API
+
+This is the documentation of the Invoice App's frontend API.
+Bla bla bla …
+
+## Store (store)
+
+Invoices have a subject, date, sender address, receipient address,
+positions, and stuff.
+
+### Retreiving all objects (store.findAll)
+
+Returns all objects of current user
+
++ Parameters
+    + type (string)
+
+    + Resolves: 2 Invoices
+
+        [
+          {id: 1, type: 'invoice', subject: 'funk'},
+          {id: 2, type: 'invoice', subject: 'wicked'}
+        ]
+
+    + Resolves: 1 Invoice with very long subject
+
+        [
+          {id: 1, type: 'invoice', subject: 'funk funk funk funk funk funk funk funk'}
+        ]
+
+    + Rejects: Server Error
+
+        {
+          name: 'ServerError',
+          message: 'Could not reach server.'
+        }
+
+    + Rejects: Unauthenticated Error
+
+        {
+          name: 'UnauthenticatedError',
+          message: 'You are not signed in.'
+        }
+
+### Add new or update existing object (store.save)
+
++ Parameters
+    + properties (properties)
+        + subject* (string)
+        + date* (string)
+        + sender* (string)
+        + senderVAT (string)
+        + receipient* (string)
+        + receipientVAT (string)
+
+    + Resolves: new Invoice
+
+        {
+          id: '123',
+          subject: {{properties.subject}},
+          date: {{properties.date}},
+          sender: {{properties.sender}},
+          senderVAT: {{properties.senderVAT}},
+          receipient: {{properties.receipient}},
+          receipientVAT: {{properties.receipientVAT}},
+          createdAt: '2013-10-10T10:00:00.000Z',
+          updatedAt: '2013-10-10T10:00:00.000Z'
+        }
+
+    + Rejects: Invalid Error
+
+        {
+          name: 'InvalidError',
+          message: 'The Object is invalid',
+          fields: {
+            date: 'The date must live in the future',
+            sender: 'A sender\'s Address must be provided'
+          },
+          object: {{properties}}
+        }
+
+    + Rejects: Server Error
+
+        {
+          name: 'ServerError',
+          message: 'Could not reach server.',
+          object: {{properties}}
+        }
+
+    + Rejects: Unauthenticated Error
+
+        {
+          name: 'UnauthenticatedError',
+          message: 'You are not signed in.',
+          object: {{properties}}
+        }
+
++ Parameters
+    + properties (properties)
+        + id* (string)
+        + type* (string)
+        + subject* (string)
+        + date* (string)
+        + sender* (string)
+        + senderVAT (string)
+        + receipient* (string)
+        + receipientVAT (string)
+        + createdAt (string)
+        + updatedAt (string)
+
+    + Resolves: new Store
+
+        {{properties}}
+
+    + Rejects: Store Error
+
+        {
+          name: 'InvalidError',
+          message: 'The object is invalid',
+          fields: {
+            date: 'The date must live in the future',
+            sender: 'A sender\'s Address must be provided'
+          },
+          object: {{properties}}
+        }
+
+    + Rejects: Server Error
+
+        {
+          name: 'ServerError',
+          message: 'Could not reach server.',
+          object: {{properties}}
+        }
+
+    + Rejects: Unauthenticated Error
+
+        {
+          name: 'UnauthenticatedError',
+          message: 'You are not signed in.',
+          object: {{properties}}
+        }
+
+
+### Removing existing object (store.remove)
+
++ Parameters
+    + object
+        + id* (string)
+        + type* (string)
+
+    + Resolves: removed Invoice
+
+        {{properties}}
+
+    + Rejects: NotFound Error
+
+        {
+          name: 'NotFoundError',
+          message: 'The Invoice could not be found'
+        }
+
+    + Rejects: Server Error
+
+        {
+          name: 'ServerError',
+          message: 'Could not reach server.'
+        }
+
+    + Rejects: Unauthenticated Error
+
+        {
+          name: 'UnauthenticatedError',
+          message: 'You are not signed in.'
+        }
+
+
+## Account (account)
+
+### Signing up for account (account.signUp)
+
++ Parameters
+    + username* (string)
+    + password* (string)
+    + additionInfo (object)
+
+    + Resolves: success
+
+        {{username}}
+
+        + Triggers: SignUp Event (account:signup)
+            + {{username}}
+
+    + Resolves: delayed success
+
+        {{username}}
+
+        + Delays: 5s
+        + Triggers: SignUp Event (account:signup)
+
+            + {{username}}
+
+    + Rejects: Invalid username Error (InvalidUsernameError)
+
+        {
+          name: 'InvalidUsernameError',
+          message: 'You are not signed in.'
+        }
+
+    + Rejects: Server Error (ServerError)
+
+        {
+          name: 'ServerError',
+          message: 'Could not reach server.'
+        }
+
+
+### Signing in to account (account.signIn)
+
++ Parameters
+    + username* (string)
+    + password* (string)
+
+    + Resolves: success
+
+        {{username}}
+
+        + Triggers: SignIn Event (account:signin)
+            + {{username}}
+
+    + Rejects: Invalid username or Password Error
+
+        {
+          name: 'InvalidUsernameOrPasswordError',
+          message: 'Your username or password is wrong.'
+        }
+
+    + Rejects: Server Error (ServerError)
+
+        {
+          name: 'ServerError',
+          message: 'Could not reach server.'
+        }
+
+### signing out (account.signOut)
+
++ Resolves: success
+    + Triggers: SignOut Event (account:signout)
+
++ Rejects: Server Error (ServerError)
+
+    {
+      name: 'ServerError',
+      message: 'Could not reach server.'
+    }
+
+### Events (account.on)
+
+Subscribe to account events. This gets populated automatically
+by parsing `Triggers: ...` declarations.
+
++ Parameters
+    + eventName* (string)
+    + callback* (function)
+
+
+## Remote (remote)
+
+### Events (remote.on)
+
+Subscribe to remote events. Currently used are `add:invoice`,
+`remove:invoice` and `update:invoice`.
+
+
+## Download (download)
+
++ Parameters
+    + something*
+
+## Convert (convert({{element}}).to({{filename}}))
+
++ Parameters
+    + element* (DOM)
+    + filename* (string)
+
+    + Resolves: generated PDF URL
+          'http://example.com/path/to/generated.pdf'
+
+    + Rejects: Convert Error
+
+            {
+              name: 'ConvertError',
+              message: 'Could not convert the passed DOM element.'
+            }
+
+    + Rejects: Server Error
+
+            {
+              name: 'ServerError',
+              message: 'Could not reach server.'
+            }
+
+
+## Sending emails (sendEmail)
+
++ Parameters
+  + options
+    + to* (string)
+    + subject* (string)
+    + text* (string)
+    + html* (string)
+    + attachments (array)
+
