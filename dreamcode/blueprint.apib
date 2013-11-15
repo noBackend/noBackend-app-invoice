@@ -12,7 +12,7 @@ positions, and stuff.
 
 Returns all objects of current user
 
-+ Parameters
++ Arguments
     + type (string)
 
     + Resolves: 2 Invoices
@@ -44,7 +44,7 @@ Returns all objects of current user
 
 ### Add new or update existing object (store.save)
 
-+ Parameters
++ Arguments
     + properties (properties)
         + subject* (string)
         + date* (string)
@@ -95,7 +95,7 @@ Returns all objects of current user
           object: {{properties}}
         }
 
-+ Parameters
++ Arguments
     + properties (properties)
         + id* (string)
         + type* (string)
@@ -143,7 +143,7 @@ Returns all objects of current user
 
 ### Removing existing object (store.remove)
 
-+ Parameters
++ Arguments
     + object
         + id* (string)
         + type* (string)
@@ -178,7 +178,7 @@ Returns all objects of current user
 
 ### Signing up for account (account.signUp)
 
-+ Parameters
++ Arguments
     + username* (string)
     + password* (string)
     + additionInfo (object)
@@ -216,7 +216,7 @@ Returns all objects of current user
 
 ### Signing in to account (account.signIn)
 
-+ Parameters
++ Arguments
     + username* (string)
     + password* (string)
 
@@ -258,7 +258,7 @@ Returns all objects of current user
 Subscribe to account events. This gets populated automatically
 by parsing `Triggers: ...` declarations.
 
-+ Parameters
++ Arguments
     + eventName* (string)
     + callback* (function)
 
@@ -273,12 +273,12 @@ Subscribe to remote events. Currently used are `add:invoice`,
 
 ## Download (download)
 
-+ Parameters
++ Arguments
     + something*
 
 ## Convert (convert({{element}}).to({{filename}}))
 
-+ Parameters
++ Arguments
     + element* (DOM)
     + filename* (string)
 
@@ -302,7 +302,7 @@ Subscribe to remote events. Currently used are `add:invoice`,
 
 ## Sending emails (sendEmail)
 
-+ Parameters
++ Arguments
   + options
     + to* (string)
     + subject* (string)
